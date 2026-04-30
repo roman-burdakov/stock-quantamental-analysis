@@ -1,0 +1,51 @@
+{
+  "cik": "1045810",
+  "entityType": "operating",
+  "sic": "3674",
+  "sicDescription": "Semiconductors & Related Devices",
+  "name": "NVIDIA CORP",
+  "tickers": ["NVDA"],
+  "exchanges": ["Nasdaq"],
+  "filings": {
+    "recent": {
+      "accessionNumber": [
+        "0001045810-25-000013",
+        "0001045810-24-000124",
+        "0001045810-24-000076",
+        "0001045810-24-000013"
+      ],
+      "filingDate": [
+        "2025-02-26",
+        "2024-11-20",
+        "2024-08-28",
+        "2024-02-21"
+      ],
+      "reportDate": [
+        "2025-01-26",
+        "2024-10-27",
+        "2024-07-28",
+        "2024-01-28"
+      ],
+      "form": [
+        "10-K",
+        "10-Q",
+        "10-Q",
+        "10-K"
+      ],
+      "primaryDocument": [
+        "nvda-20250126.htm",
+        "nvda-20241027.htm",
+        "nvda-20240728.htm",
+        "nvda-20240128.htm"
+      ],
+      "primaryDocDescription": [
+        "10-K",
+        "10-Q",
+        "10-Q",
+        "10-K"
+      ],
+      "isXBRL": [1, 1, 1, 1],
+      "items": ["", "", "", ""]
+    }
+  }
+}

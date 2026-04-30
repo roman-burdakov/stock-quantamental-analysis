@@ -1,0 +1,42 @@
+[
+  {
+    "accession_number": "0001045810-15-000036",
+    "form_type": "10-K",
+    "section_name": "business",
+    "char_count": 0,
+    "filing_date": "2015-03-12",
+    "source_available_date": "2015-03-12",
+    "parse_status": "missing",
+    "text": ""
+  },
+  {
+    "accession_number": "0001045810-15-000036",
+    "form_type": "10-K",
+    "section_name": "risk_factors",
+    "char_count": 0,
+    "filing_date": "2015-03-12",
+    "source_available_date": "2015-03-12",
+    "parse_status": "missing",
+    "text": ""
+  },
+  {
+    "accession_number": "0001045810-15-000036",
+    "form_type": "10-K",
+    "section_name": "mda",
+    "char_count": 0,
+    "filing_date": "2015-03-12",
+    "source_available_date": "2015-03-12",
+    "parse_status": "missing",
+    "text": ""
+  },
+  {
+    "accession_number": "0001045810-15-000036",
+    "form_type": "10-K",
+    "section_name": "quant",
+    "char_count": 0,
+    "filing_date": "2015-03-12",
+    "source_available_date": "2015-03-12",
+    "parse_status": "missing",
+    "text": ""
+  }
+]

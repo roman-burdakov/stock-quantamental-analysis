@@ -1,0 +1,6 @@
+feature_period,feature_available_date,prediction_date,target_period,target_available_date,target_name,target_value,source_accessions,FCF_margin,gross_margin,operating_margin,revenue_growth_YoY,nlp_mda_ai_accelerated_computing
+FY2020,2020-02-20,2020-02-20,FY2021,2021-02-24,revenue_growth_yoy,0.53,acc-2020,0.25,0.62,0.3,,0.023347429226634762
+FY2021,2021-02-24,2021-02-24,FY2022,2022-02-23,revenue_growth_yoy,0.61,acc-2021,0.3,0.65,0.35,0.53,0.03947362210825767
+FY2022,2022-02-23,2022-02-23,FY2023,2023-02-22,revenue_growth_yoy,-0.21,acc-2022,0.33,0.66,0.38,0.61,0.010784015325759627
+FY2023,2023-02-22,2023-02-22,FY2024,2024-02-21,revenue_growth_yoy,1.26,acc-2023,0.15,0.57,0.17,-0.21,0.02619748748226697
+FY2024,2024-02-21,2024-02-21,,,revenue_growth_yoy,,acc-2024,0.44,0.73,0.54,1.26,0.03002831387424008

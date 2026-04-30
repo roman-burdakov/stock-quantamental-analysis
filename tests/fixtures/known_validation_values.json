@@ -1,0 +1,63 @@
+{
+  "description": "Published Nvidia 10-K values for validation. Sources: Nvidia Annual Reports (SEC filings). FY ends last Sunday of January.",
+  "tolerance_pct": 2.0,
+  "values": {
+    "FY2024": {
+      "fiscal_year_end": "2024-01-28",
+      "filing_date": "2024-02-21",
+      "source_available_date": "2024-02-21",
+      "accession_number": "0001045810-24-000013",
+      "revenue": 60922000000,
+      "gross_margin": 0.7274,
+      "operating_margin": 0.5413,
+      "net_income": 29760000000,
+      "operating_cash_flow": 28090000000,
+      "capex": 1069000000,
+      "fcf": 27021000000,
+      "diluted_shares": 24940000000,
+      "diluted_eps": 1.19,
+      "_note_eps": "Post-split value (10:1 split on 2024-06-10); pre-split was 11.93",
+      "cash_and_short_term_investments": 25984000000,
+      "total_debt": 9709000000,
+      "r_and_d": 8675000000
+    },
+    "FY2025": {
+      "fiscal_year_end": "2025-01-26",
+      "filing_date": "2025-02-26",
+      "source_available_date": "2025-02-26",
+      "accession_number": "0001045810-25-000013",
+      "revenue": 130497000000,
+      "gross_margin": 0.7764,
+      "operating_margin": 0.6241,
+      "net_income": 72880000000,
+      "operating_cash_flow": 64089000000,
+      "capex": 3233000000,
+      "fcf": 60856000000,
+      "diluted_shares": 24780000000,
+      "diluted_eps": 2.94,
+      "cash_and_short_term_investments": 44269000000,
+      "total_debt": 8462000000,
+      "r_and_d": 12893000000
+    },
+    "FY2023": {
+      "fiscal_year_end": "2023-01-29",
+      "filing_date": "2023-02-24",
+      "source_available_date": "2023-02-24",
+      "accession_number": "0001045810-23-000016",
+      "revenue": 26974000000,
+      "gross_margin": 0.5693,
+      "operating_margin": 0.2098,
+      "net_income": 4368000000,
+      "operating_cash_flow": 5641000000,
+      "capex": 1833000000,
+      "fcf": 3808000000,
+      "diluted_shares": 24960000000,
+      "diluted_eps": 0.17,
+      "_note_capex": "Uses PaymentsToAcquireProductiveAssets (PP&E + intangible assets), not PaymentsToAcquirePropertyPlantAndEquipment",
+      "_note_eps": "Post-split value (10:1 split on 2024-06-10); pre-split was 1.74",
+      "cash_and_short_term_investments": 13296000000,
+      "total_debt": 10953000000,
+      "r_and_d": 7339000000
+    }
+  }
+}

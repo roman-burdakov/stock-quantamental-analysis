@@ -1,0 +1,420 @@
+{# ================================================================== #}
+{# report_base.md.j2 — NVDA Quantamental Equity Research Report      #}
+{# Concise main report + Technical Appendix                          #}
+{# All lists use tables for reliable PDF rendering                    #}
+{# ================================================================== #}
+
+{% macro fmt_component(name) -%}
+{{ name | replace("_", " ") | title | replace("Dcf", "DCF") | replace("Ml ", "ML ") | replace("Nlp ", "NLP ") | replace("Eps", "EPS") | replace("Fcf", "FCF") }}
+{%- endmacro %}
+
+{# ---- 1. COVER PAGE ---- #}
+{% include "cover_page.md.j2" %}
+
+---
+
+{% if report_mode == "failed" %}
+*{{ company_name }} ({{ ticker }}) — Report Generation Failed — {{ report_date }}*
+{% else %}
+
+{# ---- 2. EXECUTIVE SUMMARY ---- #}
+{% include "executive_summary.md.j2" %}
+
+---
+
+{# ---- 3. FUNDAMENTAL ANALYSIS ---- #}
+## Fundamental Analysis — 10-Year Financial History (FY2016–FY2026)
+
+**Data vintage:** FY2026 values reflect full-year reported annual figures from NVIDIA's 10-K filed 2026-02-25 (acc. 0001045810-26-000021), available to the pipeline as of the report date. Quarterly chart points are shown for trend context and may not be directly comparable to annual table rows.
+
+{% if metrics %}
+| Metric | Value | Period |
+|--------|-------|--------|
+{% for m in metrics %}
+| {{ m.name }} | {{ m.value }} | {{ m.period }} |
+{% endfor %}
+{% endif %}
+
+{% if exhibits %}
+{% for eid, epath in exhibits.items() %}
+{% if "revenue_growth_trend" in epath %}
+![Revenue Growth Trend]({{ epath }})
+*Exhibit: YoY revenue growth. Source: SEC EDGAR XBRL.*
+{% endif %}
+{% if "margin_trends" in epath %}
+![Margin Trends]({{ epath }})
+*Exhibit: Gross, operating, and net margin trends. Source: SEC EDGAR XBRL.*
+{% endif %}
+{% if "fcf_trend" in epath %}
+![FCF Trend]({{ epath }})
+*Exhibit: Free cash flow and FCF margin. Source: SEC EDGAR XBRL.*
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if inflection_points %}
+### Inflection Points (FY2016–FY2026)
+
+| Period | Metric | Description |
+|--------|--------|-------------|
+{% for ip in inflection_points %}
+| {{ ip.period }} | {{ ip.metric }} | {{ ip.description }} |
+{% endfor %}
+{% endif %}
+
+### Platform Revenue Cross-Check (Manual)
+
+NVIDIA reports revenue by two reportable segments (Compute & Networking; Graphics) and by market platform. The automated XBRL segment extraction collapsed platform labels to generic categories, so the segment chart is suppressed. The following table is manually verified against NVIDIA 10-K filings.
+
+| Platform | FY2023 | FY2024 | FY2025 |
+|----------|--------|--------|--------|
+| Data Center | $15.0B | $47.5B | $115.2B |
+| Gaming | $9.1B | $10.4B | $11.4B |
+| Professional Visualization | $1.5B | $1.6B | $1.9B |
+| Automotive | $0.9B | $1.1B | $1.5B |
+| OEM & Other | $0.5B | $0.3B | $0.5B |
+| **Total Revenue** | **$27.0B** | **$60.9B** | **$130.5B** |
+
+*Source: NVIDIA 10-K filings — FY2023 (acc. 0001045810-23-000017), FY2024 (acc. 0001045810-24-000029), FY2025 (acc. 0001045810-25-000023). Platform revenue basis.*
+
+**Key takeaway:** Data Center grew from 56% of total in FY2023 to 88% in FY2025 (analyst interpretation of platform revenue trend). This concentration is both the core thesis and the primary risk.
+
+---
+
+{# ---- 4. VALUATION AND RECOMMENDATION ---- #}
+{% if report_mode == "diagnostic_not_rated" %}
+## Diagnostic Valuation (Not for Recommendation)
+
+> **Diagnostic only — do not use for recommendation.**
+{% else %}
+## Valuation and Recommendation
+
+**Rating: {{ rating }}{% if rating_label is defined %} ({{ rating_label }}){% endif %}** | **Intrinsic Value: ${{ "%.2f"|format(target_price) }}** | **Current Price: ${{ "%.2f"|format(current_price) }}** | **Upside/Downside: {{ "%.1f"|format(upside_pct * 100) }}%**
+{% endif %}
+
+{% if scenarios %}
+### Scenario Analysis
+
+| Scenario | Prob. | Rev. CAGR | Term. FCF Margin | Value/Share | Notes |
+|----------|-------|-----------|------------------|-------------|-------|
+{% for name, sc in scenarios.items() %}
+| {{ sc.name | capitalize }} | {{ "%.0f"|format(sc.probability * 100) }}% | {{ "%.1f"|format(sc.revenue_cagr * 100) }}% | {{ "%.1f"|format(sc.fcf_margin_terminal * 100) }}% | ${{ "%.2f"|format(sc.per_share_value) if sc.per_share_value is defined else "—" }} | {{ sc.analyst_notes | default("") }} |
+{% endfor %}
+{% endif %}
+
+### Scenario Probability Sensitivity
+
+| Distribution | Bear | Base | Bull | Prob.-Weighted Value | vs. $199.57 |
+|-------------|------|------|------|---------------------|-------------|
+| Bear-skewed | 35% | 50% | 15% | $143.63 | -28.0% |
+| **Current** | **25%** | **50%** | **25%** | **$173.04** | **-13.3%** |
+| Bull-skewed | 15% | 50% | 35% | $202.46 | +1.4% |
+
+*Scenario weights are analyst judgment. The full bear scenario requires multiple adverse risks to co-occur; a high-probability individual risk does not mechanically imply >35% bear weight.*
+
+{% if sensitivity_table is defined and sensitivity_table %}
+### Sensitivity Analysis (WACC × Terminal Growth)
+
+{{ sensitivity_table }}
+{% endif %}
+
+{% if reverse_dcf_grid is defined and reverse_dcf_grid %}
+### Reverse-DCF Implied Expectations
+
+{{ reverse_dcf_grid }}
+{% endif %}
+
+{% if exhibits %}
+{% for eid, epath in exhibits.items() %}
+{% if "dcf_scenarios" in epath %}
+![DCF Scenarios]({{ epath }})
+*Exhibit: Bear / Base / Bull scenario valuations. Source: Analyst DCF model.*
+{% endif %}
+{% if "reverse_dcf_grid" in epath %}
+![Reverse-DCF Grid]({{ epath }})
+*Exhibit: Implied share price at various CAGR × margin assumptions. Source: Analyst model.*
+{% endif %}
+{% endfor %}
+{% endif %}
+
+### WACC Build-Up and Judgment Bridge
+
+| Component | Value | Rationale |
+|-----------|-------|-----------|
+| Risk-free rate | 4.3% | 10-year US Treasury yield (analyst assumption) |
+| Equity risk premium | 5.5% | Long-run historical ERP (analyst assumption) |
+| Beta | 1.65 | 5-year monthly beta vs. S&P 500 (analyst assumption) |
+| CAPM cost of equity | 13.4% | 4.3% + 1.65 × 5.5% |
+| CAPM-implied WACC | 12.9% | 95% equity × 13.4% + 5% debt × 3.1% |
+| Net cash / low-leverage adj. | -1.0% | Near-zero net debt and D/E of 0.05 reduce perceived financial-distress risk |
+| FCF quality adj. | -1.0% | FCF margin of 44.8% and strong cash conversion support lower business-risk adjustment |
+| Competitive-position adj. | -0.9% | CUDA ecosystem and market position appear to reduce revenue tail risk (analyst assessment) |
+| Total quality adjustment | -2.9% | Sum of illustrative analyst-judgment adjustments; not statistically estimated |
+| **Selected analyst WACC** | **10.0%** | **Analyst judgment — rounded down from CAPM after quality / balance-sheet adjustment** |
+
+Each sub-component is analyst judgment; the decomposition is illustrative of the reasoning behind the 10.0% selected WACC, not a statistically derived estimate. The adjustment is valuation-friendly, so strict CAPM users should rely more heavily on the 12.9% case.
+
+### Dual WACC Valuation Comparison
+
+| WACC Case | WACC | Base Value | Prob.-Wtd. Value | vs. $199.57 |
+|-----------|------|-----------|-----------------|-------------|
+| Analyst | 10.0% | $141.20 | $173.04 | -13.3% (Hold) |
+| CAPM | 12.9% | ~$88.70 | Not recomputed | ~-55.6% (base) |
+
+*Prob.-weighted value at 12.9% not recomputed (pipeline uses single WACC). Directional estimate: $100–$120 range.*
+
+{% if peer_multiples_core is defined and peer_multiples_core %}
+### Peer Multiples — Core Semiconductor & Infrastructure
+
+{{ peer_multiples_core }}
+
+{% if peer_multiples_nvda is defined and peer_multiples_nvda %}
+**Subject Company — NVIDIA:**
+
+{{ peer_multiples_nvda }}
+{% endif %}
+
+Peer multiples support the Hold directionally: NVDA trades at a premium revenue multiple versus most clean peers, while its P/E looks less extreme because current earnings are unusually elevated. Comps neither overturn the DCF downside nor justify a Sell on their own. *AI-capex context and excluded peers in Technical Appendix.*
+{% endif %}
+
+---
+
+{# ---- 5. RISK HEAT MAP AND CATALYSTS ---- #}
+## Risk Assessment and Catalysts
+
+### Risk Heat Map
+
+| Risk | Prob. | Sev. | Key Signpost |
+|------|-------|------|-------------|
+| Export controls tightening | High | High | New BIS rules; China revenue in 10-Q |
+| Hyperscaler capex deceleration | Med | High | Capex guidance in earnings calls |
+| Customer concentration | High | Med | Customer disclosure in 10-K |
+| Custom silicon substitution | Med | Med | Custom chip announcements |
+| Margin normalization | Med | Med | Gross margin trend in 10-Q |
+| Supply-chain / foundry risk | Low | High | Foundry capacity; geopolitical indices |
+| Valuation compression | Med | High | Multiple contraction on deceleration |
+
+*Prob./sev. ratings are analyst judgment. Risk thresholds are monitoring thresholds, not verified facts. Full mechanisms in Technical Appendix.*
+
+### Top Catalysts
+
+| Catalyst | Confirmation Signal |
+|----------|---------------------|
+| Sustained data center growth | Strong YoY growth for 3+ consecutive quarters (monitoring threshold) |
+| Blackwell product cycle | Revenue exceeds Hopper ramp; margins stabilize at high levels |
+| Enterprise AI broadening | Revenue grows materially; customer base expands beyond hyperscalers |
+| Software/networking attach | Revenue share increases (monitoring threshold) |
+
+*Full catalyst table in Technical Appendix.*
+
+{% if upgrade_triggers is defined and upgrade_triggers %}
+### What Would Upgrade to Buy
+
+| No. | Trigger |
+|-----|---------|
+{% for trigger in upgrade_triggers %}
+| {{ loop.index }} | {{ trigger }} |
+{% endfor %}
+{% endif %}
+
+{% if downgrade_triggers is defined and downgrade_triggers %}
+### What Would Downgrade to Sell
+
+| No. | Trigger |
+|-----|---------|
+{% for trigger in downgrade_triggers %}
+| {{ loop.index }} | {{ trigger }} |
+{% endfor %}
+{% endif %}
+
+---
+
+{# ---- 6. QUANTAMENTAL METHOD ---- #}
+## Quantamental Method
+
+### ML Model Summary
+
+| Parameter | Value |
+|-----------|-------|
+| **Model** | ElasticNet / Ridge regression |
+| **Target** | Next-period revenue growth (YoY) |
+| **Training Data** | 10-year XBRL financial metrics (FY2016–FY2025) |
+| **Validation** | Walk-forward expanding-window, no lookahead |
+| **Observations** | 4 usable target values (annual) |
+| **Best baseline RMSE** | 0.65 (mean baseline) |
+| **Model R²** | Not computed — pipeline reports RMSE only; 4 usable annual observations make R² unstable and not decision-useful |
+| **Model Status** | Diagnostic only — excluded from rating |
+
+The ML model has only 4 usable annual target observations — far too few for reliable out-of-sample prediction. The model underperforms or matches naive baselines. Full details in `outputs/model_audit.md`.
+
+### NLP Signal
+
+NLP extraction coverage: {{ nlp_stats.coverage_pct if nlp_stats is defined and nlp_stats else "N/A" }}% (threshold: 50%). Diagnostic appendix only — excluded from the Hold recommendation.
+
+**Use in recommendation:** Neither ML nor NLP signals support the Hold rating. The recommendation is based entirely on DCF valuation, scenario analysis, and analyst judgment.
+
+---
+
+{# ---- 7. SCALABILITY ---- #}
+## Scalability and Automation
+
+| Component | Automation | Component | Automation |
+|-----------|-----------|-----------|-----------|
+| SEC ingestion | High | NLP extraction | Medium |
+| XBRL parsing | Medium-High | ML model | Low (single) / Med-High (panel) |
+| Data validation | Medium | DCF valuation | Medium |
+| Segment mapping | Low-Medium | Report generation | High |
+
+**Fully automated:** SEC ingestion → XBRL → validation → metrics → NLP → ML → DCF → report → audit. **Analyst judgment required:** scenario assumptions, peer selection, final recommendation. See Technical Appendix for full scorecard.
+
+---
+
+{# ---- 8. SOURCE ATTRIBUTION ---- #}
+## Source Attribution and Audit
+
+**Data sources:** SEC EDGAR XBRL (companyfacts API), yfinance (market prices, peer financials). All data filtered to `source_available_date ≤ {{ report_date }}`. Zero lookahead violations.
+
+**LLM systems:** Claude / Kiro (Anthropic) for implementation and report generation. ChatGPT / OpenAI for audit, critique, and prompt generation. LLM outputs were not treated as sources of truth.
+
+**Prompt-log coverage:** Verbatim prompts where available; reconstructed summaries for earlier workflow prompts. Missing prompts did not serve as factual sources. See `outputs/prompt_log.md`.
+
+**Exhibits:** This report includes 7 active charts (revenue growth, margins, FCF, DCF scenarios, reverse-DCF grid, recommendation scorecard, and peer multiples). Two NLP diagnostic charts (narrative drift and keyword heatmap) appear in the Technical Appendix only — they are below the coverage threshold and excluded from the rating. The automated segment revenue chart is not shown because XBRL label extraction was unreliable; a manual platform revenue table is provided instead.
+
+---
+
+*{{ company_name }} ({{ ticker }}) — Quantamental Research Report — {{ report_date }}*
+*Prepared for MIT 15.C51. All data sourced from SEC EDGAR, public market data, and author analysis.*
+*This report was prepared for academic purposes and should not be considered professional investment advice.*
+
+---
+
+{# ================================================================== #}
+{# TECHNICAL APPENDIX                                                 #}
+{# ================================================================== #}
+
+# Technical Appendix
+
+## A. Diagnostic NLP Exhibits
+
+{% if nlp_stats is defined and nlp_stats %}
+| Metric | Value |
+|--------|-------|
+| Filings Attempted | {{ nlp_stats.filings_attempted }} |
+| Filings Parsed | {{ nlp_stats.filings_parsed }} |
+| Coverage | {{ nlp_stats.coverage_pct }}% |
+| Threshold | 50% |
+| Status | {% if nlp_stats.coverage_pct >= 50 %}Pass{% else %}Below threshold{% endif %} |
+{% endif %}
+
+{% if exhibits %}
+{% for eid, epath in exhibits.items() %}
+{% if "narrative_drift" in epath %}
+![Narrative Drift — Diagnostic]({{ epath }})
+*Diagnostic only. Coverage {{ nlp_stats.coverage_pct if nlp_stats is defined and nlp_stats else "N/A" }}% < 50% threshold. Excluded from Hold recommendation.*
+{% endif %}
+{% if "keyword_theme_heatmap" in epath %}
+![Keyword Theme Heatmap — Diagnostic]({{ epath }})
+*Diagnostic only. Coverage {{ nlp_stats.coverage_pct if nlp_stats is defined and nlp_stats else "N/A" }}% < 50% threshold. Excluded from Hold recommendation.*
+{% endif %}
+{% endfor %}
+{% endif %}
+
+## B. ML/NLP Failure Analysis
+
+| Component | Evidence | Why Excluded | What Would Help |
+|-----------|----------|-------------|-----------------|
+| ML revenue model | 4 annual obs.; R² not reported (unstable at this sample size); best-baseline RMSE = 0.65; model underperforms | Feature-to-obs. ratio ~6:1; overfit risk | Cross-company panel (500+ obs.) |
+| Best baseline | Mean baseline RMSE = 0.65; last-period RMSE = 0.97 | Used as benchmark only | N/A |
+| NLP drift | Coverage = 32.4% vs. 50% threshold | HTML parsing failures on older filings | Form-specific parsing; manual QA |
+| Diagnostic composite | Not backtested; descriptive scorecard | Not a predictive model | Backtesting framework |
+
+The ML/NLP work documents why single-company annual ML is underpowered and defines the data conditions required for a scalable quantamental pipeline.
+
+## C. Full Risk Detail
+
+{% if risk_details is defined and risk_details %}
+| Risk | Mechanism | Affected Metric | Signpost |
+|------|-----------|-----------------|----------|
+{% for rd in risk_details %}
+| {{ rd.risk }} | {{ rd.mechanism }} | {{ rd.affected_metric }} | {{ rd.signpost }} |
+{% endfor %}
+
+*Quantified estimates are analyst assessments, not independently verified statistics.*
+{% endif %}
+
+## D. Full Catalyst Table
+
+{% if catalyst_details is defined and catalyst_details %}
+| Catalyst | Confirmation Signal | Assumption Affected |
+|----------|---------------------|---------------------|
+{% for c in catalyst_details %}
+| {{ c.catalyst }} | {{ c.confirmation }} | {{ c.assumption_affected }} |
+{% endfor %}
+
+*Catalyst thresholds are analyst monitoring thresholds, not verified current facts.*
+{% endif %}
+
+## E. Peer Universe and AI-Capex Context
+
+{% if peer_multiples_context is defined and peer_multiples_context %}
+**AI-Capex Customer Context** (capex trajectories signal GPU demand; not valuation comps):
+
+{{ peer_multiples_context }}
+{% endif %}
+
+{% if peer_exclusions is defined and peer_exclusions %}
+**Excluded peers:**
+
+| Ticker | Reason |
+|--------|--------|
+{% for ex in peer_exclusions %}
+| {{ ex.ticker }} | {{ ex.reasons }} |
+{% endfor %}
+{% endif %}
+
+{% if survivorship_bias_disclosure is defined and survivorship_bias_disclosure %}
+*Survivorship bias: {{ survivorship_bias_disclosure }}*
+{% endif %}
+
+## F. Scalability Scorecard
+
+| Component | Level | Notes |
+|-----------|-------|-------|
+| SEC ingestion | High | EDGAR API with caching and provenance |
+| XBRL parsing | Med-High | Multi-concept fallback |
+| Validation | Medium | Requires published reference values |
+| Segment mapping | Low-Med | Company-specific label mappings |
+| NLP extraction | Medium | HTML structure varies by filer |
+| ML model | Low/Med-High | Single-co. limited; panel viable |
+| DCF valuation | Medium | Analyst judgment required |
+| Report gen. | High | Jinja2 templates to PDF/HTML |
+| Audit | High | Automated consistency checks |
+
+## G. Component Status
+
+{% if component_statuses is defined and component_statuses %}
+| Component | Status | Reason |
+|-----------|--------|--------|
+{% for cs in component_statuses %}
+{% set display_status = cs.status | replace("_", " ") | title %}
+{% if cs.status == "unavailable" and cs.component_name == "segment" %}{% set display_status = "Hidden" %}{% endif %}
+{% if cs.status == "diagnostic_only" %}{% set display_status = "Diagnostic" %}{% endif %}
+| {{ fmt_component(cs.component_name) }} | {{ display_status }} | {{ cs.reason }} |
+{% endfor %}
+{% endif %}
+
+## H. Data Quality Controls
+
+All data satisfies `source_available_date` ≤ {{ report_date }}. ML matrix enforces no-lookahead constraints. Zero violations. Full waterfall in `outputs/data_quality_report.md`.
+
+{% if audit_warnings is defined and audit_warnings %}
+## I. Audit Warnings
+
+| No. | Warning |
+|-----|---------|
+{% for warning in audit_warnings %}
+| {{ loop.index }} | {{ warning }} |
+{% endfor %}
+{% endif %}
+
+{% endif %}{# end if report_mode != "failed" #}

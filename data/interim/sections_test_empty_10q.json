@@ -1,0 +1,22 @@
+[
+  {
+    "accession_number": "test-empty-10q",
+    "form_type": "10-Q",
+    "section_name": "risk_factors",
+    "char_count": 0,
+    "filing_date": "2025-01-01",
+    "source_available_date": "2025-01-01",
+    "parse_status": "missing",
+    "text": ""
+  },
+  {
+    "accession_number": "test-empty-10q",
+    "form_type": "10-Q",
+    "section_name": "mda",
+    "char_count": 0,
+    "filing_date": "2025-01-01",
+    "source_available_date": "2025-01-01",
+    "parse_status": "missing",
+    "text": ""
+  }
+]

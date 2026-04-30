@@ -1,0 +1,372 @@
+{
+  "description": "Published 10-K values for NVIDIA Corporation (CIK 0001045810). Values sourced from SEC EDGAR XBRL companyfacts and verified against 10-K filings. All monetary values in raw USD (not thousands/millions). NVIDIA fiscal years end on the last Sunday of January. A 10:1 stock split occurred on June 10, 2024; per-share and share-count values are noted with their split basis.",
+  "source": "SEC EDGAR 10-K filings via companyfacts API (data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json)",
+  "cik": "0001045810",
+  "ticker": "NVDA",
+  "split_history": [
+    {
+      "date": "2024-06-10",
+      "ratio": 10,
+      "description": "10-for-1 stock split"
+    }
+  ],
+  "values": {
+    "FY2023": {
+      "fiscal_year_end": "2023-01-29",
+      "fiscal_year_start": "2022-01-31",
+      "filing_date": "2023-02-24",
+      "accession_number": "0001045810-23-000017",
+      "form_type": "10-K",
+      "metrics": {
+        "revenue": {
+          "value": 26974000000,
+          "unit": "USD",
+          "xbrl_concept": "Revenues",
+          "source_description": "Consolidated Statements of Income - Total revenue",
+          "notes": null
+        },
+        "gross_profit": {
+          "value": 15356000000,
+          "unit": "USD",
+          "xbrl_concept": "GrossProfit",
+          "source_description": "Consolidated Statements of Income - Gross profit",
+          "notes": null
+        },
+        "operating_income": {
+          "value": 4224000000,
+          "unit": "USD",
+          "xbrl_concept": "OperatingIncomeLoss",
+          "source_description": "Consolidated Statements of Income - Income from operations",
+          "notes": null
+        },
+        "net_income": {
+          "value": 4368000000,
+          "unit": "USD",
+          "xbrl_concept": "NetIncomeLoss",
+          "source_description": "Consolidated Statements of Income - Net income",
+          "notes": null
+        },
+        "operating_cash_flow": {
+          "value": 5641000000,
+          "unit": "USD",
+          "xbrl_concept": "NetCashProvidedByUsedInOperatingActivities",
+          "source_description": "Consolidated Statements of Cash Flows - Net cash provided by operating activities",
+          "notes": null
+        },
+        "capex": {
+          "value": 1833000000,
+          "unit": "USD",
+          "xbrl_concept": "PaymentsToAcquireProductiveAssets",
+          "source_description": "Consolidated Statements of Cash Flows - Purchases of property and equipment and intangible assets",
+          "notes": "FY2023 capex reported as comparative in FY2024 10-K using PaymentsToAcquireProductiveAssets concept. Includes property, equipment, and intangible assets."
+        },
+        "free_cash_flow": {
+          "value": 3808000000,
+          "unit": "USD",
+          "xbrl_concept": "derived",
+          "source_description": "Computed as operating_cash_flow minus capex (5,641M - 1,833M)",
+          "notes": "Derived metric: OCF - capex. Not a direct XBRL tag."
+        },
+        "cash_and_equivalents": {
+          "value": 3389000000,
+          "unit": "USD",
+          "xbrl_concept": "CashAndCashEquivalentsAtCarryingValue",
+          "source_description": "Consolidated Balance Sheets - Cash and cash equivalents",
+          "notes": "Balance sheet instant value as of fiscal year end"
+        },
+        "short_term_investments": {
+          "value": 9907000000,
+          "unit": "USD",
+          "xbrl_concept": "MarketableSecuritiesCurrent",
+          "source_description": "Consolidated Balance Sheets - Short-term investments",
+          "notes": null
+        },
+        "cash_and_short_term_investments": {
+          "value": 13296000000,
+          "unit": "USD",
+          "xbrl_concept": "derived",
+          "source_description": "Cash and equivalents (3,389M) + short-term investments (9,907M)",
+          "notes": "Derived: sum of cash_and_equivalents + short_term_investments"
+        },
+        "total_debt": {
+          "value": 10953000000,
+          "unit": "USD",
+          "xbrl_concept": "LongTermDebt",
+          "source_description": "Total debt including current and non-current portions (LongTermDebtNoncurrent 9,703M + DebtCurrent 1,250M)",
+          "notes": "LongTermDebt concept includes both current and non-current portions. Verified: LongTermDebtNoncurrent (9,703M) + DebtCurrent (1,250M) = 10,953M"
+        },
+        "diluted_shares": {
+          "value": 2507000000,
+          "unit": "shares",
+          "xbrl_concept": "WeightedAverageNumberOfDilutedSharesOutstanding",
+          "source_description": "Consolidated Statements of Income - Diluted weighted average shares outstanding",
+          "notes": "Pre-split basis (as originally reported in FY2023 10-K). Post-split equivalent: 25,070,000,000 shares (restated in FY2025 10-K)."
+        },
+        "diluted_shares_post_split": {
+          "value": 25070000000,
+          "unit": "shares",
+          "xbrl_concept": "WeightedAverageNumberOfDilutedSharesOutstanding",
+          "source_description": "Restated in FY2025 10-K for 10:1 split",
+          "notes": "Post-split restated value from FY2025 10-K (accn 0001045810-25-000023)"
+        },
+        "diluted_eps": {
+          "value": 1.74,
+          "unit": "USD/share",
+          "xbrl_concept": "EarningsPerShareDiluted",
+          "source_description": "Consolidated Statements of Income - Diluted net income per share",
+          "notes": "Pre-split basis (as originally reported in FY2023 10-K). Post-split equivalent: $0.17 (restated in FY2025 10-K)."
+        },
+        "diluted_eps_post_split": {
+          "value": 0.17,
+          "unit": "USD/share",
+          "xbrl_concept": "EarningsPerShareDiluted",
+          "source_description": "Restated in FY2025 10-K for 10:1 split",
+          "notes": "Post-split restated value from FY2025 10-K (accn 0001045810-25-000023)"
+        },
+        "r_and_d": {
+          "value": 7339000000,
+          "unit": "USD",
+          "xbrl_concept": "ResearchAndDevelopmentExpense",
+          "source_description": "Consolidated Statements of Income - Research and development expense",
+          "notes": null
+        }
+      }
+    },
+    "FY2024": {
+      "fiscal_year_end": "2024-01-28",
+      "fiscal_year_start": "2023-01-30",
+      "filing_date": "2024-02-21",
+      "accession_number": "0001045810-24-000029",
+      "form_type": "10-K",
+      "metrics": {
+        "revenue": {
+          "value": 60922000000,
+          "unit": "USD",
+          "xbrl_concept": "Revenues",
+          "source_description": "Consolidated Statements of Income - Total revenue",
+          "notes": null
+        },
+        "gross_profit": {
+          "value": 44301000000,
+          "unit": "USD",
+          "xbrl_concept": "GrossProfit",
+          "source_description": "Consolidated Statements of Income - Gross profit",
+          "notes": null
+        },
+        "operating_income": {
+          "value": 32972000000,
+          "unit": "USD",
+          "xbrl_concept": "OperatingIncomeLoss",
+          "source_description": "Consolidated Statements of Income - Income from operations",
+          "notes": null
+        },
+        "net_income": {
+          "value": 29760000000,
+          "unit": "USD",
+          "xbrl_concept": "NetIncomeLoss",
+          "source_description": "Consolidated Statements of Income - Net income",
+          "notes": null
+        },
+        "operating_cash_flow": {
+          "value": 28090000000,
+          "unit": "USD",
+          "xbrl_concept": "NetCashProvidedByUsedInOperatingActivities",
+          "source_description": "Consolidated Statements of Cash Flows - Net cash provided by operating activities",
+          "notes": null
+        },
+        "capex": {
+          "value": 1069000000,
+          "unit": "USD",
+          "xbrl_concept": "PaymentsToAcquireProductiveAssets",
+          "source_description": "Consolidated Statements of Cash Flows - Purchases of property and equipment and intangible assets",
+          "notes": null
+        },
+        "free_cash_flow": {
+          "value": 27021000000,
+          "unit": "USD",
+          "xbrl_concept": "derived",
+          "source_description": "Computed as operating_cash_flow minus capex (28,090M - 1,069M)",
+          "notes": "Derived metric: OCF - capex. Not a direct XBRL tag."
+        },
+        "cash_and_equivalents": {
+          "value": 7280000000,
+          "unit": "USD",
+          "xbrl_concept": "CashAndCashEquivalentsAtCarryingValue",
+          "source_description": "Consolidated Balance Sheets - Cash and cash equivalents",
+          "notes": "Balance sheet instant value as of fiscal year end"
+        },
+        "short_term_investments": {
+          "value": 18704000000,
+          "unit": "USD",
+          "xbrl_concept": "MarketableSecuritiesCurrent",
+          "source_description": "Consolidated Balance Sheets - Short-term investments",
+          "notes": null
+        },
+        "cash_and_short_term_investments": {
+          "value": 25984000000,
+          "unit": "USD",
+          "xbrl_concept": "derived",
+          "source_description": "Cash and equivalents (7,280M) + short-term investments (18,704M)",
+          "notes": "Derived: sum of cash_and_equivalents + short_term_investments"
+        },
+        "total_debt": {
+          "value": 9709000000,
+          "unit": "USD",
+          "xbrl_concept": "LongTermDebt",
+          "source_description": "Total debt including current and non-current portions (LongTermDebtNoncurrent 8,459M + DebtCurrent 1,250M)",
+          "notes": "LongTermDebt concept includes both current and non-current portions. Verified: LongTermDebtNoncurrent (8,459M) + DebtCurrent (1,250M) = 9,709M"
+        },
+        "diluted_shares": {
+          "value": 2494000000,
+          "unit": "shares",
+          "xbrl_concept": "WeightedAverageNumberOfDilutedSharesOutstanding",
+          "source_description": "Consolidated Statements of Income - Diluted weighted average shares outstanding",
+          "notes": "Pre-split basis (as originally reported in FY2024 10-K). Post-split equivalent: 24,940,000,000 shares (restated in FY2025 10-K)."
+        },
+        "diluted_shares_post_split": {
+          "value": 24940000000,
+          "unit": "shares",
+          "xbrl_concept": "WeightedAverageNumberOfDilutedSharesOutstanding",
+          "source_description": "Restated in FY2025 10-K for 10:1 split",
+          "notes": "Post-split restated value from FY2025 10-K (accn 0001045810-25-000023)"
+        },
+        "diluted_eps": {
+          "value": 11.93,
+          "unit": "USD/share",
+          "xbrl_concept": "EarningsPerShareDiluted",
+          "source_description": "Consolidated Statements of Income - Diluted net income per share",
+          "notes": "Pre-split basis (as originally reported in FY2024 10-K). Post-split equivalent: $1.19 (restated in FY2025 10-K)."
+        },
+        "diluted_eps_post_split": {
+          "value": 1.19,
+          "unit": "USD/share",
+          "xbrl_concept": "EarningsPerShareDiluted",
+          "source_description": "Restated in FY2025 10-K for 10:1 split",
+          "notes": "Post-split restated value from FY2025 10-K (accn 0001045810-25-000023)"
+        },
+        "r_and_d": {
+          "value": 8675000000,
+          "unit": "USD",
+          "xbrl_concept": "ResearchAndDevelopmentExpense",
+          "source_description": "Consolidated Statements of Income - Research and development expense",
+          "notes": null
+        }
+      }
+    },
+    "FY2025": {
+      "fiscal_year_end": "2025-01-26",
+      "fiscal_year_start": "2024-01-29",
+      "filing_date": "2025-02-26",
+      "accession_number": "0001045810-25-000023",
+      "form_type": "10-K",
+      "metrics": {
+        "revenue": {
+          "value": 130497000000,
+          "unit": "USD",
+          "xbrl_concept": "Revenues",
+          "source_description": "Consolidated Statements of Income - Total revenue",
+          "notes": "Key regression value: must parse as ~$130.5B, not $27B (the original misparse)"
+        },
+        "gross_profit": {
+          "value": 97858000000,
+          "unit": "USD",
+          "xbrl_concept": "GrossProfit",
+          "source_description": "Consolidated Statements of Income - Gross profit",
+          "notes": null
+        },
+        "operating_income": {
+          "value": 81453000000,
+          "unit": "USD",
+          "xbrl_concept": "OperatingIncomeLoss",
+          "source_description": "Consolidated Statements of Income - Income from operations",
+          "notes": null
+        },
+        "net_income": {
+          "value": 72880000000,
+          "unit": "USD",
+          "xbrl_concept": "NetIncomeLoss",
+          "source_description": "Consolidated Statements of Income - Net income",
+          "notes": null
+        },
+        "operating_cash_flow": {
+          "value": 64089000000,
+          "unit": "USD",
+          "xbrl_concept": "NetCashProvidedByUsedInOperatingActivities",
+          "source_description": "Consolidated Statements of Cash Flows - Net cash provided by operating activities",
+          "notes": null
+        },
+        "capex": {
+          "value": 3236000000,
+          "unit": "USD",
+          "xbrl_concept": "PaymentsToAcquireProductiveAssets",
+          "source_description": "Consolidated Statements of Cash Flows - Purchases of property and equipment and intangible assets",
+          "notes": null
+        },
+        "free_cash_flow": {
+          "value": 60853000000,
+          "unit": "USD",
+          "xbrl_concept": "derived",
+          "source_description": "Computed as operating_cash_flow minus capex (64,089M - 3,236M)",
+          "notes": "Derived metric: OCF - capex. Not a direct XBRL tag."
+        },
+        "cash_and_equivalents": {
+          "value": 8589000000,
+          "unit": "USD",
+          "xbrl_concept": "CashAndCashEquivalentsAtCarryingValue",
+          "source_description": "Consolidated Balance Sheets - Cash and cash equivalents",
+          "notes": "Balance sheet instant value as of fiscal year end"
+        },
+        "short_term_investments": {
+          "value": 34621000000,
+          "unit": "USD",
+          "xbrl_concept": "MarketableSecuritiesCurrent",
+          "source_description": "Consolidated Balance Sheets - Short-term investments",
+          "notes": null
+        },
+        "cash_and_short_term_investments": {
+          "value": 43210000000,
+          "unit": "USD",
+          "xbrl_concept": "derived",
+          "source_description": "Cash and equivalents (8,589M) + short-term investments (34,621M)",
+          "notes": "Derived: sum of cash_and_equivalents + short_term_investments"
+        },
+        "total_debt": {
+          "value": 8463000000,
+          "unit": "USD",
+          "xbrl_concept": "LongTermDebt",
+          "source_description": "Total debt including current and non-current portions (LongTermDebtNoncurrent 8,463M + DebtCurrent 0)",
+          "notes": "LongTermDebt concept includes both current and non-current portions. FY2025 has no current debt (DebtCurrent = 0)."
+        },
+        "diluted_shares": {
+          "value": 24804000000,
+          "unit": "shares",
+          "xbrl_concept": "WeightedAverageNumberOfDilutedSharesOutstanding",
+          "source_description": "Consolidated Statements of Income - Diluted weighted average shares outstanding",
+          "notes": "Post-split basis (FY2025 10-K filed after the June 2024 10:1 split). All share counts in this filing are on post-split basis."
+        },
+        "diluted_eps": {
+          "value": 2.94,
+          "unit": "USD/share",
+          "xbrl_concept": "EarningsPerShareDiluted",
+          "source_description": "Consolidated Statements of Income - Diluted net income per share",
+          "notes": "Post-split basis. All per-share values in FY2025 10-K are on post-split basis."
+        },
+        "r_and_d": {
+          "value": 12914000000,
+          "unit": "USD",
+          "xbrl_concept": "ResearchAndDevelopmentExpense",
+          "source_description": "Consolidated Statements of Income - Research and development expense",
+          "notes": null
+        }
+      }
+    }
+  },
+  "validation_notes": {
+    "capex_concept_change": "NVIDIA switched from PaymentsToAcquirePropertyPlantAndEquipment to PaymentsToAcquireProductiveAssets around FY2023. The latter includes property, equipment, and intangible assets. FY2023 capex was first reported as a comparative in the FY2024 10-K.",
+    "split_adjustment": "NVIDIA executed a 10:1 stock split on June 10, 2024. FY2023 and FY2024 per-share values have both pre-split (as originally reported) and post-split (restated in FY2025 10-K) variants. FY2025 values are natively post-split.",
+    "fcf_derivation": "Free cash flow is derived as operating_cash_flow minus capex (PaymentsToAcquireProductiveAssets). This is not a direct XBRL concept.",
+    "cash_and_investments": "cash_and_short_term_investments is derived as CashAndCashEquivalentsAtCarryingValue + MarketableSecuritiesCurrent. Does not include non-current investments.",
+    "total_debt_composition": "total_debt uses the LongTermDebt XBRL concept which includes both current and non-current portions. Verified against LongTermDebtNoncurrent + DebtCurrent for each year.",
+    "regression_key_value": "FY2025 revenue of $130,497,000,000 is the critical regression test value. The original pipeline misparse returned ~$26.974B (a quarterly/YTD value) instead of the correct annual total."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "overall_status": "pass",
+  "package_status": "formal_rating_pass",
+  "data_quality_status": "pass",
+  "recommendation_eligibility": "formal_rating",
+  "component_statuses": {
+    "limitations_consistency": "pass",
+    "rating_consistency": "pass",
+    "model_audit_consistency": "pass",
+    "ml_support_consistency": "pass",
+    "final_artifact_audit": "pass",
+    "segment_table_consistency": "pass",
+    "peer_pe_consistency": "pass",
+    "source_attribution_quality": "pass",
+    "limitations_exhibit_consistency": "pass",
+    "nlp_coverage_proof": "pass",
+    "suppressed_exhibit_leakage": "pass",
+    "formatting_scan": "pass",
+    "display_window_enforcement": "pass",
+    "llm_attribution_completeness": "pass",
+    "ml_results_present_in_pdf": "pass_with_warnings",
+    "nlp_status_consistency": "pass",
+    "assignment_ml_requirement": "pass"
+  },
+  "checks_run": 17,
+  "checks_passed": 17,
+  "checks_failed": 0,
+  "blocking_issues": [],
+  "failure_details": [],
+  "timestamp": "2026-05-03T21:08:42.208238Z",
+  "run_id": "20260503T210838Z",
+  "skip_tests": false,
+  "final_recommendation": "Hold",
+  "final_rating_label": "Hold / Market Perform",
+  "final_current_price": 199.57000732421875,
+  "final_intrinsic_value": 173.04,
+  "final_target_price": 173.04,
+  "final_upside_downside": -0.1329,
+  "active_exhibits": [
+    "margin_trends",
+    "fcf_trend",
+    "dcf_scenarios",
+    "reverse_dcf_grid",
+    "recommendation_scorecard",
+    "revenue_growth_trend",
+    "peer_multiples_comparison"
+  ],
+  "suppressed_exhibits": [
+    "revenue_segment_mix"
+  ],
+  "diagnostic_appendix_exhibits": [
+    "narrative_drift",
+    "keyword_theme_heatmap"
+  ],
+  "audited_artifact_paths": [
+    "outputs/nvda_quantamental_report.md",
+    "outputs/nvda_quantamental_report.html",
+    "outputs/nvda_quantamental_report.pdf",
+    "outputs/executive_summary.md",
+    "outputs/source_attribution.md",
+    "outputs/limitations.md",
+    "outputs/model_audit.md",
+    "outputs/data_quality_report.md",
+    "outputs/prompt_log.md"
+  ],
+  "audited_artifact_hashes": {
+    "nvda_quantamental_report.md": "4a10277bbbaa841c0b2bab8eaa64bdc126e92f8f77c70e4a415b6fb8c332bec6",
+    "nvda_quantamental_report.html": "a4dded49993712c2ce2925459c8f555eeb01e489dae3544c1034085b65f34e8e",
+    "nvda_quantamental_report.pdf": "2e3b61be2d1e9169b284530a660b614cd4d7d84e114e8e1abeb831adf78813d8",
+    "executive_summary.md": "074d388f73ee504277dfff0d713ea8705a9615edde4b71de9eb02431aa8db71e",
+    "source_attribution.md": "dc89d7e0d0c350d89a7158ee224e9a7d5fe447a5ed6f5226cb2862a8c8b16598",
+    "limitations.md": "916ebc6817adc19f952f1def9cfa489b832f6c1e62608975f6e6999c81723461",
+    "model_audit.md": "21ea805eec3ad1d26f3c839420c162956118f6c8b9947bea4613347682dcf144",
+    "data_quality_report.md": "6854f2ce53e7d3c828dad625c0e0137f884a9b0e51683e1771a93811fcd7692c",
+    "prompt_log.md": "ce977209c9283ff3629e080e17fb150641cef2d5067b56f4e89dc3fd5b344f23"
+  }
+}

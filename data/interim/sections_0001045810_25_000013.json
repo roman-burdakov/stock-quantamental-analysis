@@ -1,0 +1,42 @@
+[
+  {
+    "accession_number": "0001045810-25-000013",
+    "form_type": "10-K",
+    "section_name": "business",
+    "char_count": 2137,
+    "filing_date": "2025-02-26",
+    "source_available_date": "2025-02-26",
+    "parse_status": "success",
+    "text": "Business\n\nNVIDIA pioneered accelerated computing to help solve the most challenging computational problems. Since our original focus on PC graphics, we have expanded to several other large and important computationally intensive fields. Leveraging our expertise in GPU design, system architecture, and AI software, we have built platforms that address four large markets: Data Center, Gaming, Professional Visualization, and Automotive.\n\nOur Platforms and Products\n\nOur Data Center platforms are designed to accelerate the most compute-intensive workloads, such as AI training and inference, data analytics, and high-performance computing. Our GPU architectures, including Hopper and Blackwell, power the world\u2019s leading AI infrastructure. NVIDIA DGX systems, HGX platforms, and networking solutions including InfiniBand and Spectrum-X provide end-to-end data center acceleration.\n\nOur Gaming platforms leverage the same GPU architecture to deliver immersive experiences. GeForce RTX GPUs feature real-time ray tracing and AI-powered DLSS technology. Our gaming revenue also includes GeForce NOW cloud gaming.\n\nCompetition\n\nThe markets in which we operate are highly competitive and characterized by rapid technological change. We face competition from companies such as AMD, Intel, and other semiconductor companies, as well as cloud service providers developing custom silicon. In the data center market, we compete with custom AI accelerators developed by hyperscale customers including Google (TPU), Amazon (Trainium/Inferentia), and Microsoft (Maia).\n\nSeasonality and Customers\n\nOur Data Center revenue has grown significantly, driven by demand for AI training and inference. Revenue from a limited number of customers represents a significant portion of our total revenue. Sales to one customer, Customer A, represented approximately 13% of total revenue for fiscal year 2025.\n\nManufacturing\n\nWe do not manufacture the semiconductor wafers used for our products and different different different instead utilize foundries such as TSMC and Samsung. We depend on these foundries for the production of our GPU and networking products."
+  },
+  {
+    "accession_number": "0001045810-25-000013",
+    "form_type": "10-K",
+    "section_name": "risk_factors",
+    "char_count": 2316,
+    "filing_date": "2025-02-26",
+    "source_available_date": "2025-02-26",
+    "parse_status": "success",
+    "text": "Risk Factors\n\nRisks Related to Our Business and Industry\n\nDemand for our data center products and services may not meet our expectations, and we may not be able to accurately forecast demand.\n\nDemand for our data center products, including products based on our Hopper and Blackwell architectures, has surged due to the rapid adoption of AI. If demand does not continue at current levels, or if customers reduce their capital expenditure plans for AI infrastructure, our revenue and financial results could be materially adversely affected. We have made significant investments in new product development and manufacturing capacity based on demand signals that may not materialize.\n\nExport controls and trade restrictions may adversely affect our business.\n\nThe U.S. government has imposed and may continue to impose export controls on advanced computing chips and related technologies. In October 2022 and October 2023, the Bureau of Industry and Security imposed restrictions on exports of certain advanced computing semiconductors and related items to China and other countries. These restrictions have adversely affected and may continue to adversely affect our Data Center revenue from China. We have developed different different different alternative products for different different different affected markets, but there is no assurance these products will achieve comparable revenue levels. Additional restrictions could further limit our ability to sell products in key markets.\n\nWe depend on a limited number of third-party manufacturers and suppliers.\n\nWe rely on third-party foundries, primarily TSMC, to manufacture our semiconductor products. Any disruption in the operations of our foundry partners, including due to natural disasters, geopolitical tensions, or capacity constraints, could adversely affect our ability to meet customer demand. Supply constraints have in the past limited our ability to fulfill orders and may do so in the future.\n\nCustomer concentration may adversely affect our business.\n\nA significant portion of our Data Center revenue is derived from a limited number of customers, including major cloud service providers. The loss of, or a significant reduction in purchases by, one or more of these customers could materially adversely affect our revenue and financial results."
+  },
+  {
+    "accession_number": "0001045810-25-000013",
+    "form_type": "10-K",
+    "section_name": "mda",
+    "char_count": 1907,
+    "filing_date": "2025-02-26",
+    "source_available_date": "2025-02-26",
+    "parse_status": "success",
+    "text": "Management\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n\nOverview\n\nTotal revenue for fiscal year 2025 was $130.5 billion, an increase of 114% from fiscal year 2024. The increase was primarily driven by Data Center revenue growth of 142%, reflecting strong demand for our Hopper architecture GPU products for AI training and inference workloads. Data Center revenue was $115.2 billion, representing 88% of total revenue.\n\nRevenue by Reportable Segments\n\nSegment\nFY2025\nFY2024\nChange\n\nCompute & Networking\n$119,026M\n$51,178M\n133%\n\nGraphics\n$11,471M\n$9,744M\n18%\n\nTotal\n$130,497M\n$60,922M\n114%\n\nRevenue by Market Platform\n\nMarket Platform\nFY2025\nFY2024\nChange\n\nData Center\n$115,199M\n$47,525M\n142%\n\nGaming\n$11,360M\n$10,447M\n9%\n\nProfessional Visualization\n$2,079M\n$1,553M\n34%\n\nAutomotive\n$1,859M\n$1,091M\n70%\n\nOEM and Other\n$0M\n$306M\nNM\n\nTotal\n$130,497M\n$60,922M\n114%\n\nGross Margin\n\nGAAP gross margin for fiscal year 2025 was 75.0%, compared to 72.7% for fiscal year 2024. The increase in gross margin was primarily due to a higher mix of Data Center revenue, which carries higher margins, and improved yields on our Hopper architecture products.\n\nOperating Expenses\n\nResearch and development expenses were $12.9 billion for fiscal year 2025, an increase of 49% from $8.7 billion in fiscal year 2024, reflecting increased headcount and infrastructure investments to support our product roadmap including Blackwell architecture development.\n\nLiquidity and Capital Resources\n\nAs of January 26, 2025, we had $44.3 billion in cash, cash equivalents, and marketable securities. Operating cash flow was $64.1 billion for fiscal year 2025, compared to $28.1 billion for fiscal year 2024. Capital expenditures were $3.2 billion for fiscal year 2025. Free cash flow was $60.9 billion.\n\nDuring fiscal year 2025, we returned $33.1 billion to shareholders through share repurchases and dividends."
+  },
+  {
+    "accession_number": "0001045810-25-000013",
+    "form_type": "10-K",
+    "section_name": "quant",
+    "char_count": 0,
+    "filing_date": "2025-02-26",
+    "source_available_date": "2025-02-26",
+    "parse_status": "missing",
+    "text": ""
+  }
+]

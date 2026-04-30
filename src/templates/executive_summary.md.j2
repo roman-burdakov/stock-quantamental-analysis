@@ -1,0 +1,92 @@
+{# Executive Summary Template — concise, max 2 pages #}
+{# All lists use tables for reliable PDF rendering #}
+
+## Executive Summary
+
+{% if report_mode == "failed" %}
+**{{ company_name }} ({{ ticker }}) — Report Generation Failed**
+
+The pipeline encountered a critical error. See `outputs/audit_status.json` for details.
+
+{% elif report_mode == "diagnostic_not_rated" %}
+**{{ company_name }} ({{ ticker }}) — Not Rated — Data Validation Required**
+
+{{ thesis }}
+
+> **Diagnostic Report:** One or more blocking validation gates failed.
+
+{% else %}
+**{{ company_name }} ({{ ticker }}) — {{ rating }}{% if rating_label is defined %} ({{ rating_label }}){% endif %}**
+
+**Investor Action:** Existing holders maintain positions. New capital should wait for a better entry point or evidence that bull-case assumptions (sustained >20% revenue CAGR, terminal FCF margins >30%) are materializing.
+
+{{ thesis }}
+
+{% if recommendation is defined and recommendation %}
+### Valuation Summary
+
+| | Bear (25%) | Base (50%) | Bull (25%) | Prob.-Weighted |
+|---|---|---|---|---|
+| **Value/Share** | ${{ "%.2f"|format(recommendation.bear_value) }} | ${{ "%.2f"|format(recommendation.base_value) }} | ${{ "%.2f"|format(recommendation.bull_value) }} | **${{ "%.2f"|format(recommendation.expected_value) }}** |
+
+| Metric | Value |
+|--------|-------|
+| **Current Price** | ${{ "%.2f"|format(current_price) }} |
+| **Intrinsic Value** | ${{ "%.2f"|format(target_price) }} |
+| **Upside / Downside** | {{ "%.1f"|format(upside_pct * 100) }}% |
+| **WACC** | 10.0% (analyst judgment; CAPM-implied 12.9%) |
+| **Terminal Growth** | 3.0% |
+{% endif %}
+
+### Quantamental Contribution
+
+| Contribution | Description |
+|-------------|-------------|
+| XBRL extraction | 10 years of financial data parsed from SEC EDGAR with automated cross-checks against published 10-K values |
+| Scenario-weighted DCF | Three-scenario probability-weighted DCF with reverse-DCF grids revealing implied market expectations |
+| ML/NLP quality gates | ElasticNet model and TF-IDF narrative drift built and tested but honestly excluded — model underperformed baselines; NLP coverage below threshold |
+
+### Why Hold, Not Sell?
+
+{{ why_hold_not_sell if why_hold_not_sell is defined and why_hold_not_sell else "The modeled downside is valuation-driven, not evidence of business deterioration. The bull case remains material. See Valuation section for CAPM-WACC sensitivity analysis." }}
+
+### Top Risks
+
+| No. | Risk |
+|-----|------|
+{% if key_risks is defined and key_risks %}
+{% for risk in key_risks[:3] %}
+| {{ loop.index }} | {{ risk }} |
+{% endfor %}
+{% endif %}
+
+{% if upgrade_triggers is defined and upgrade_triggers %}
+### What Would Upgrade to Buy
+
+| No. | Trigger |
+|-----|---------|
+{% for trigger in upgrade_triggers %}
+| {{ loop.index }} | {{ trigger }} |
+{% endfor %}
+{% endif %}
+
+{% if downgrade_triggers is defined and downgrade_triggers %}
+### What Would Downgrade to Sell
+
+| No. | Trigger |
+|-----|---------|
+{% for trigger in downgrade_triggers %}
+| {{ loop.index }} | {{ trigger }} |
+{% endfor %}
+{% endif %}
+
+{% if recommendation is defined and recommendation %}
+### What Must Be True
+
+| Rating | Condition |
+|--------|-----------|
+| **Buy** | {{ recommendation.what_must_be_true_buy }} |
+| **Hold** | {{ recommendation.what_must_be_true_hold }} |
+| **Sell** | {{ recommendation.what_must_be_true_sell }} |
+{% endif %}
+{% endif %}

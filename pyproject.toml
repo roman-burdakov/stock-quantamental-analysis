@@ -1,0 +1,36 @@
+[project]
+name = "nvda-quantamental-engine"
+version = "0.1.0"
+description = "Reproducible quantamental pipeline producing an A+ equity research report for Nvidia"
+requires-python = ">=3.13"
+dependencies = [
+    "pandas",
+    "numpy",
+    "scipy",
+    "scikit-learn",
+    "requests",
+    "yfinance",
+    "beautifulsoup4",
+    "lxml",
+    "matplotlib",
+    "seaborn",
+    "jinja2",
+    "pytest",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+enhancements = [
+    "xgboost",
+    "shap",
+    "sentence-transformers",
+    "bertopic",
+    "ruptures",
+    "weasyprint",
+]
+
+[project.scripts]
+run-pipeline = "scripts.run_pipeline:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,85 @@
+{# Cover Page Template — Quantamental Engine #}
+{# Uses FinalRecommendation as canonical source #}
+{# All lists use tables for reliable PDF rendering #}
+
+---
+
+# {{ company_name }} ({{ ticker }})
+
+## Quantamental Equity Research Report
+
+**Report Date:** {{ report_date }}
+{% if analyst_name is defined and analyst_name %}
+**Prepared by:** {{ analyst_name }}{% if analyst_title is defined and analyst_title %}, {{ analyst_title }}{% endif %}
+
+{% endif %}
+
+{% if report_mode == "failed" %}
+
+---
+
+> **Report Generation Failed.** See `outputs/audit_status.json` for details.
+
+---
+
+{% elif report_mode == "diagnostic_not_rated" %}
+
+---
+
+| Metric | Value |
+|--------|-------|
+| **Rating** | Not Rated — Data Validation Required |
+{% if current_price and current_price > 0 %}
+| **Current Price** | ${{ "%.2f"|format(current_price) }} |
+{% else %}
+| **Current Price** | Unavailable |
+{% endif %}
+| **Target Price** | N/A — Diagnostic Only |
+| **Upside / Downside** | N/A |
+
+---
+
+> **Not Rated — Data Validation Required.** One or more blocking validation gates failed.
+
+---
+
+{% else %}
+
+---
+
+| Metric | Value |
+|--------|-------|
+| **Rating** | **{{ rating }}** {% if rating_label is defined %}({{ rating_label }}){% endif %} |
+| **Current Price** | ${{ "%.2f"|format(current_price) }} |
+| **Intrinsic Value** | ${{ "%.2f"|format(target_price) }} |
+| **Upside / Downside** | {{ "%.1f"|format(upside_pct * 100) }}% |
+
+---
+
+{% endif %}
+
+{% if report_mode != "failed" %}
+### Investment Thesis
+
+{{ thesis }}
+
+---
+
+### Key Highlights
+
+| No. | Highlight |
+|-----|-----------|
+{% for bullet in key_bullets %}
+| {{ loop.index }} | {{ bullet }} |
+{% endfor %}
+
+---
+
+### Key Risks
+
+| No. | Risk |
+|-----|------|
+{% for risk in key_risks %}
+| {{ loop.index }} | {{ risk }} |
+{% endfor %}
+{% endif %}

@@ -1,0 +1,34 @@
+# NVDA Quantamental Engine - Dependencies
+# Requires Python >= 3.13
+# Core data and computation
+pandas
+numpy
+scipy
+scikit-learn
+
+# SEC and market data
+requests
+yfinance
+beautifulsoup4
+lxml
+
+# Visualization
+matplotlib
+seaborn
+
+# Report generation
+jinja2
+tabulate
+markdown
+
+# Testing
+pytest
+python-dotenv
+
+# Optional enhancements (uncomment as needed)
+# xgboost
+shap  # optional: SHAP feature importance for tree models (Task 17.4)
+sentence-transformers
+bertopic
+ruptures
+# weasyprint

@@ -1,0 +1,22 @@
+[
+  {
+    "accession_number": "test-10q",
+    "form_type": "10-Q",
+    "section_name": "risk_factors",
+    "char_count": 1909,
+    "filing_date": "2024-11-20",
+    "source_available_date": "2024-11-20",
+    "parse_status": "success",
+    "text": "Risk Factors\n\nIn addition to the other information set forth in this Quarterly Report on Form 10-Q, you should carefully consider the risk factors discussed in Part I, Item 1A of our Annual Report on Form 10-K for the fiscal year ended January 28, 2024. There have been no material changes to the risk factors previously disclosed, except as noted below.\n\nDemand for our products based on the Blackwell architecture may not meet our expectations.\n\nWe have begun different different different different shipping products based on our Blackwell architecture, including the B200 and GB200 GPUs. Customer demand for Blackwell products has been very strong, and we are working to ramp production to meet this demand. However, there is no assurance that demand will continue at current levels or that we will be able to produce sufficient quantities to meet demand. Production ramp challenges, including supply chain constraints and manufacturing yields, could limit our ability to fulfill orders.\n\nAdditional export control restrictions could further limit our revenue from China and other affected markets.\n\nThe U.S. government continues to evaluate and may impose additional restrictions on exports of advanced computing technologies. Any additional restrictions could further reduce our revenue from China and other affected markets. During the third quarter of fiscal year 2025, revenue from China declined as a percentage of total Data Center revenue compared to prior periods, reflecting the impact of existing export controls.\n\nOur increasing capital expenditure requirements may affect our financial flexibility.\n\nAs we scale our data center and cloud infrastructure to support customer demand and our own AI research, our capital expenditure requirements have increased significantly. We expect capital expenditures to continue to increase, which could reduce our free cash flow and financial flexibility."
+  },
+  {
+    "accession_number": "test-10q",
+    "form_type": "10-Q",
+    "section_name": "mda",
+    "char_count": 1623,
+    "filing_date": "2024-11-20",
+    "source_available_date": "2024-11-20",
+    "parse_status": "success",
+    "text": "Management\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n\nOverview\n\nRevenue for the third quarter of fiscal year 2025 was $35.1 billion, an increase of 94% from the third quarter of fiscal year 2024 and an increase of 17% sequentially. Data Center revenue was $30.8 billion, an increase of 112% year-over-year, driven by strong demand for our Hopper architecture products, including H100 and H200 GPUs, for AI training and inference.\n\nRevenue by Reportable Segments\n\nSegment\nQ3 FY2025\nQ3 FY2024\nChange\n\nCompute & Networking\n$31,036M\n$14,645M\n112%\n\nGraphics\n$4,046M\n$3,429M\n18%\n\nTotal\n$35,082M\n$18,074M\n94%\n\nGross Margin\n\nGAAP gross margin for the third quarter of fiscal year 2025 was 74.6%, compared to 74.0% for the second quarter of fiscal year 2025 and 73.5% for the third quarter of fiscal year 2024. The sequential increase was primarily due to favorable product mix within our Data Center segment.\n\nOperating Expenses\n\nResearch and development expenses were $3.4 billion for the third quarter of fiscal year 2025, an increase of 44% from $2.4 billion in the third quarter of fiscal year 2024. The increase was primarily driven by higher compensation costs associated with increased headcount to support our expanding product portfolio, including Blackwell architecture development.\n\nLiquidity\n\nAs of October 27, 2024, we had $38.5 billion in cash, cash equivalents, and marketable securities. We believe our existing cash balances and anticipated cash flows from operations will be sufficient to meet our working capital and capital expenditure needs for at least the next twelve months."
+  }
+]

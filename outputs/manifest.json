@@ -1,0 +1,146 @@
+{
+  "run_id": "20260503T210838Z",
+  "timestamp": "2026-05-03T21:08:42.208238Z",
+  "report_mode": "formal_rating",
+  "package_status": "formal_rating_pass",
+  "recommendation": "Hold",
+  "rating_label": "Hold / Market Perform",
+  "intrinsic_value": 173.04,
+  "target_price": 173.04,
+  "current_price": 199.57,
+  "upside_downside_pct": -0.1329,
+  "data_quality_status": "pass",
+  "skip_tests": false,
+  "active_exhibits": [
+    "margin_trends",
+    "fcf_trend",
+    "dcf_scenarios",
+    "reverse_dcf_grid",
+    "recommendation_scorecard",
+    "revenue_growth_trend",
+    "peer_multiples_comparison"
+  ],
+  "suppressed_exhibits": [
+    "revenue_segment_mix"
+  ],
+  "diagnostic_appendix_exhibits": [
+    "narrative_drift",
+    "keyword_theme_heatmap"
+  ],
+  "artifacts": {
+    "nvda_quantamental_report.md": {
+      "path": "outputs/nvda_quantamental_report.md",
+      "hash": "4a10277bbbaa841c0b2bab8eaa64bdc126e92f8f77c70e4a415b6fb8c332bec6",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "nvda_quantamental_report.html": {
+      "path": "outputs/nvda_quantamental_report.html",
+      "hash": "a4dded49993712c2ce2925459c8f555eeb01e489dae3544c1034085b65f34e8e",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "nvda_quantamental_report.pdf": {
+      "path": "outputs/nvda_quantamental_report.pdf",
+      "hash": "2e3b61be2d1e9169b284530a660b614cd4d7d84e114e8e1abeb831adf78813d8",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "executive_summary.md": {
+      "path": "outputs/executive_summary.md",
+      "hash": "074d388f73ee504277dfff0d713ea8705a9615edde4b71de9eb02431aa8db71e",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "source_attribution.md": {
+      "path": "outputs/source_attribution.md",
+      "hash": "dc89d7e0d0c350d89a7158ee224e9a7d5fe447a5ed6f5226cb2862a8c8b16598",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "limitations.md": {
+      "path": "outputs/limitations.md",
+      "hash": "916ebc6817adc19f952f1def9cfa489b832f6c1e62608975f6e6999c81723461",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "model_audit.md": {
+      "path": "outputs/model_audit.md",
+      "hash": "21ea805eec3ad1d26f3c839420c162956118f6c8b9947bea4613347682dcf144",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "data_quality_report.md": {
+      "path": "outputs/data_quality_report.md",
+      "hash": "6854f2ce53e7d3c828dad625c0e0137f884a9b0e51683e1771a93811fcd7692c",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "prompt_log.md": {
+      "path": "outputs/prompt_log.md",
+      "hash": "ce977209c9283ff3629e080e17fb150641cef2d5067b56f4e89dc3fd5b344f23",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/dcf_scenarios.png": {
+      "path": "outputs/figures/dcf_scenarios.png",
+      "hash": "71494e8b72f0eda35b132c766ca025d80945935b352e325bbd65b97793d66d09",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/fcf_trend.png": {
+      "path": "outputs/figures/fcf_trend.png",
+      "hash": "3cf534d36db5722b6ff025964988ad6547d287e09b1b0ea90365fad8ce8042fa",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/keyword_theme_heatmap.png": {
+      "path": "outputs/figures/keyword_theme_heatmap.png",
+      "hash": "ccf54777b0935df929ab1ad8e6d815b68d1e6de6a005a76118da93a9a32f8e2a",
+      "status": "suppressed",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/margin_trends.png": {
+      "path": "outputs/figures/margin_trends.png",
+      "hash": "98d46f49a6b5b3e64312125ddad181d7b2e9446b02c41a7811fbd8c6f0a10c8a",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/narrative_drift.png": {
+      "path": "outputs/figures/narrative_drift.png",
+      "hash": "56ec56f4f36cd6546340c39eb107c2b12f35997b6a44104d0d40744d410932b7",
+      "status": "suppressed",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/peer_multiples_comparison.png": {
+      "path": "outputs/figures/peer_multiples_comparison.png",
+      "hash": "22e86667bfbcd2519122866ffacaa46b7298240b55fa94f75e01d775372a82de",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/recommendation_scorecard.png": {
+      "path": "outputs/figures/recommendation_scorecard.png",
+      "hash": "bd8a2a12e46abb37496630e0758ed860936490d045d00bfc6eb150410fb6f0e5",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/revenue_growth_trend.png": {
+      "path": "outputs/figures/revenue_growth_trend.png",
+      "hash": "bbbb6c2928a575b201f27537a8ae878f5cbb60466204771d1a8d6eefbd065d88",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/revenue_segment_mix.png": {
+      "path": "outputs/figures/revenue_segment_mix.png",
+      "hash": "70d12866e986c6156704720c2eb58cbda90905caff881d0d7aa83d71f8b0ed56",
+      "status": "suppressed",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    },
+    "figures/reverse_dcf_grid.png": {
+      "path": "outputs/figures/reverse_dcf_grid.png",
+      "hash": "1c2a2cf960d4fdbc8bc4642c89cf62a8fbc635243e53c5f72fbef935f0da2a33",
+      "status": "active",
+      "generated": "2026-05-03T21:08:42.208238Z"
+    }
+  }
+}

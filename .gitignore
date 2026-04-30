@@ -1,0 +1,49 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Data (large files — keep .gitkeep)
+data/raw/filings/*.html
+data/raw/filings/*_meta.json
+data/raw/*.json
+data/raw/provenance_log.jsonl
+!data/raw/.gitkeep
+!data/raw/filings/.gitkeep
+
+# Outputs (generated)
+outputs/*.pdf
+outputs/*.html
+outputs/*.md
+outputs/*.png
+outputs/runs/
+outputs/latest/

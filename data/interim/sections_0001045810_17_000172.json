@@ -1,0 +1,22 @@
+[
+  {
+    "accession_number": "0001045810-17-000172",
+    "form_type": "10-Q",
+    "section_name": "risk_factors",
+    "char_count": 0,
+    "filing_date": "2017-11-21",
+    "source_available_date": "2017-11-21",
+    "parse_status": "missing",
+    "text": ""
+  },
+  {
+    "accession_number": "0001045810-17-000172",
+    "form_type": "10-Q",
+    "section_name": "mda",
+    "char_count": 52,
+    "filing_date": "2017-11-21",
+    "source_available_date": "2017-11-21",
+    "parse_status": "fallback",
+    "text": "of Financial Condition and Results of Operations\n 22"
+  }
+]

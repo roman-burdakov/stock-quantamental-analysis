@@ -1,0 +1,410 @@
+/*
+ * NVDA Quantamental Research Report — Professional Styling
+ *
+ * Investment-bank-grade equity research report styling.
+ * Designed for weasyprint PDF output and HTML fallback.
+ *
+ * Color palette:
+ *   Navy:   #1a1a2e  (headings, table headers, accents)
+ *   Gold:   #e8b931  (accent borders, links)
+ *   Dark:   #2c2c2c  (body text)
+ *   Gray:   #f7f8fa  (alternating rows, backgrounds)
+ *   Light:  #f0f4f8  (executive summary box)
+ */
+
+/* ================================================================
+   PAGE & PRINT LAYOUT
+   ================================================================ */
+
+@page {
+  size: A4;
+  margin: 2.5cm 2cm 2.5cm 2cm;
+
+  @bottom-center {
+    content: "NVDA Quantamental Research Report  —  Page " counter(page) " of " counter(pages);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 8pt;
+    color: #888;
+  }
+
+  @top-right {
+    content: "Confidential";
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 7pt;
+    color: #bbb;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+}
+
+@page :first {
+  @bottom-center { content: none; }
+  @top-right { content: none; }
+}
+
+/* ================================================================
+   BASE TYPOGRAPHY
+   ================================================================ */
+
+body {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1.5em;
+  line-height: 1.7;
+  color: #2c2c2c;
+  font-size: 11pt;
+  -webkit-font-smoothing: antialiased;
+}
+
+p {
+  margin: 0.6em 0;
+  orphans: 3;
+  widows: 3;
+}
+
+/* ================================================================
+   HEADINGS — sans-serif, navy
+   ================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #1a1a2e;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  letter-spacing: -0.01em;
+  page-break-after: avoid;
+}
+
+/* Cover page: first h1 */
+h1:first-of-type {
+  font-size: 2.4em;
+  text-align: center;
+  margin-top: 3em;
+  margin-bottom: 0.1em;
+  border-bottom: 3px solid #1a1a2e;
+  padding-bottom: 0.3em;
+}
+
+/* Subtitle line (first h2 after h1) */
+h1:first-of-type + h2,
+h1:first-of-type ~ h2:first-of-type {
+  text-align: center;
+  font-weight: 400;
+  font-size: 1.2em;
+  color: #555;
+  margin-top: 0;
+  border: none;
+  page-break-before: avoid;
+}
+
+/* Section headings */
+h2 {
+  font-size: 1.5em;
+  border-bottom: 2px solid #1a1a2e;
+  padding-bottom: 0.25em;
+  page-break-before: auto;
+  page-break-after: avoid;
+  page-break-inside: avoid;
+}
+
+h3 {
+  font-size: 1.15em;
+  color: #1a1a2e;
+  border-left: 3px solid #e8b931;
+  padding-left: 0.6em;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 1.05em;
+  color: #333;
+  font-weight: 600;
+}
+
+/* ================================================================
+   RATING BADGE & STRONG TEXT
+   ================================================================ */
+
+strong {
+  color: #1a1a2e;
+}
+
+/* ================================================================
+   TABLES — professional with alternating rows
+   ================================================================ */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.2em 0;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+  table-layout: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+thead th,
+th {
+  background: #1a1a2e;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.6em 0.8em;
+  text-align: left;
+  border: 1px solid #1a1a2e;
+  font-size: 9.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+td {
+  padding: 0.5em 0.8em;
+  border: 1px solid #d0d0d0;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+tr:nth-child(even) td {
+  background: #f7f8fa;
+}
+
+tr:nth-child(odd) td {
+  background: #ffffff;
+}
+
+tr:hover td {
+  background: #eef1f7;
+}
+
+/* Scorecard status color coding */
+
+/* ================================================================
+   EXECUTIVE SUMMARY BOX
+   ================================================================ */
+
+h2 + p:first-of-type,
+h2#executive-summary + p {
+  background: #f0f4f8;
+  border-left: 4px solid #1a1a2e;
+  padding: 1em 1.2em;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+  color: #333;
+}
+
+/* ================================================================
+   BLOCKQUOTES — callout / warning boxes
+   ================================================================ */
+
+blockquote {
+  background: #fff8e1;
+  border-left: 4px solid #e8b931;
+  padding: 1em 1.2em;
+  margin: 1.2em 0;
+  border-radius: 0 4px 4px 0;
+  font-size: 10.5pt;
+  color: #333;
+}
+
+blockquote strong {
+  color: #b8860b;
+}
+
+blockquote p {
+  margin: 0.4em 0;
+}
+
+/* ================================================================
+   FIGURES / CHARTS
+   ================================================================ */
+
+figure {
+  margin: 1.5em 0;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+figure img {
+  border: none;
+  box-shadow: none;
+}
+
+figcaption {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 9pt;
+  color: #777;
+  margin-top: 0.5em;
+  font-style: italic;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5em auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  page-break-inside: avoid;
+}
+
+/* Image captions (em after img) */
+img + em,
+p > em:only-child {
+  display: block;
+  text-align: center;
+  font-size: 9pt;
+  color: #777;
+  margin-top: -0.8em;
+  margin-bottom: 1.5em;
+}
+
+/* ================================================================
+   CODE / PRE BLOCKS
+   ================================================================ */
+
+pre {
+  background: #f5f6f8;
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+}
+
+code {
+  background: #eef0f3;
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+  font-size: 9.5pt;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+/* ================================================================
+   HORIZONTAL RULES
+   ================================================================ */
+
+hr {
+  border: none;
+  border-top: 1px solid #d0d0d0;
+  margin: 1.5em 0;
+}
+
+/* Cover page separator — thicker */
+h1:first-of-type ~ hr:first-of-type {
+  border-top: 2px solid #1a1a2e;
+  margin: 1.5em 0;
+}
+
+/* ================================================================
+   LISTS
+   ================================================================ */
+
+ul, ol {
+  margin: 0.8em 0;
+  padding-left: 1.8em;
+}
+
+li {
+  margin-bottom: 0.3em;
+}
+
+li::marker {
+  color: #1a1a2e;
+}
+
+/* ================================================================
+   FOOTNOTES & SOURCE ATTRIBUTION
+   ================================================================ */
+
+.footnote,
+small {
+  font-size: 0.85em;
+  color: #666;
+}
+
+.source-attribution {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 8.5pt;
+  color: #888;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 0.5em;
+  margin-top: 2em;
+}
+
+/* ================================================================
+   LINKS
+   ================================================================ */
+
+a {
+  color: #1a1a2e;
+  text-decoration: underline;
+  text-decoration-color: #e8b931;
+}
+
+a:hover {
+  color: #e8b931;
+}
+
+/* ================================================================
+   PRINT-SPECIFIC OVERRIDES
+   ================================================================ */
+
+@media print {
+  body {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 10.5pt;
+  }
+
+  h1:first-of-type {
+    margin-top: 4cm;
+  }
+
+  h2 {
+    page-break-before: auto;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  h3, h4 {
+    page-break-after: avoid;
+  }
+
+  table, figure, img, pre {
+    page-break-inside: avoid;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  blockquote {
+    page-break-inside: avoid;
+  }
+
+  a {
+    text-decoration: none;
+    color: #1a1a2e;
+  }
+
+  /* Ensure cover page gets its own page */
+  h1:first-of-type ~ hr:first-of-type {
+    page-break-after: always;
+  }
+}
