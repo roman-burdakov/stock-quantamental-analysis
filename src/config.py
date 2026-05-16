@@ -46,6 +46,299 @@ class RecommendationThresholds:
 
 
 # ---------------------------------------------------------------------------
+# v2 ML Layer Configuration (Reqs 6, 7, 8, 9, 12, Milestone 0)
+# ---------------------------------------------------------------------------
+
+@dataclass
+class MLConfig:
+    """Pre-registered v2 ML configuration.
+
+    This dataclass is the single source of truth for v2 ML decisions.
+    It MUST be committed to git BEFORE running walk-forward on the
+    latest data (Req 12.2). The pipeline records the git SHA, dirty-tree
+    status, and a hash of the canonical-JSON-serialised MLConfig at
+    ml_v2 stage entry; the audit verifies that
+    `mlconfig_committed_pre_walk_forward` is True for any tier promotion
+    above diagnostic.
+
+    No post-hoc tuning. Hyperparameter search (if any) is run on a held-out
+    development period and frozen here before walk-forward execution.
+
+    Naming reconciliation (Reqs 6, 8, 9):
+    - Primary target = `rev_growth_quarterly_YoY` (used for empirical
+      residual band, MVP-Essential confidence-band outcome).
+    - Secondary target = `rev_growth_annual_FY` (used for DCF target-price
+      adjustment ONLY when annual N_OOS >= 25 and tier >= contributing).
+    - Tertiary target = `excess_return_12m_vs_spx_direction` (sensitivity
+      only; not a gate).
+
+    Analyst data is NEVER an ML feature (Req 2). It is consumed by
+    `compare_to_analyst_overlay` for the report comparator narrative.
+    The `analyst_overlay_fields` list below is NOT a feature group; it
+    enumerates which AnalystSnapshot fields are surfaced to the report.
+    """
+
+    # --- Feature groups (Req 1, 3, 4) ---
+    # Keys: "fundamentals", "market", "nlp", "full_no_analyst".
+    # Values are lists of column names in ml_quarterly_panel.csv.
+    # `full_no_analyst` is the union of fundamentals + market + nlp; it is
+    # the feature set used by every walk-forward and ablation. NO analyst
+    # group exists in feature_groups.
+    feature_groups: dict[str, list[str]] = field(default_factory=lambda: {
+        "fundamentals": [
+            "gross_margin",
+            "operating_margin",
+            "fcf_margin",
+            "revenue_growth_QoQ",
+            "revenue_growth_YoY",
+            "rd_intensity",
+            "capex_intensity",
+            "operating_leverage",
+        ],
+        "market": [
+            "nvda_return_3m",
+            "nvda_return_12m",
+            "nvda_excess_return_3m_vs_sox",
+            "nvda_excess_return_12m_vs_sox",
+            "nvda_excess_return_3m_vs_spx",
+            "nvda_excess_return_12m_vs_spx",
+            "nvda_volatility_60d",
+            "nvda_beta_252d_vs_sox",
+        ],
+        "nlp": [
+            "narrative_drift_tfidf",
+            "sentiment_polarity",
+            "sentiment_delta",
+            "mda_length_delta",
+            "keyword_ai_accelerated_computing",
+            "keyword_data_center",
+            "keyword_competition",
+            "keyword_supply_constraints",
+        ],
+        # full_no_analyst is computed at runtime from the other three groups
+        # (see MLConfig.full_feature_columns()).
+    })
+
+    # --- Analyst overlay fields (Req 2; NOT an ML feature group) ---
+    # These are surfaced to the report comparator but never enter the
+    # ML training matrix or any walk-forward. The list documents which
+    # AnalystSnapshot attributes the comparator uses.
+    analyst_overlay_fields: list[str] = field(default_factory=lambda: [
+        "revenue_growth_curr_yr",
+        "revenue_growth_next_yr",
+        "eps_estimate_curr_yr",
+        "eps_estimate_next_yr",
+        "eps_revision_30d",
+        "eps_revision_60d",
+        "eps_revision_90d",
+        "n_analysts",
+        "recommendation_mean",
+        "recommendation_delta_30d",
+    ])
+
+    # --- Target definitions (Req 6) ---
+    # Pre-registered target identifiers. Implementation in
+    # quarterly_panel.QuarterlyPanelBuilder._attach_targets must produce
+    # columns named exactly as listed below.
+    target_definitions: dict[str, str] = field(default_factory=lambda: {
+        "primary": "rev_growth_quarterly_YoY",
+        "secondary": "rev_growth_annual_FY",
+        "tertiary": "excess_return_12m_vs_spx_direction",
+    })
+    target_definitions_version: str = "1.0.0"  # bump on any target logic change
+
+    # --- Walk-forward parameters per target (Req 6.4) ---
+    # Each target has horizon-aware embargo: embargo equals target horizon
+    # in quarters to prevent target-window overlap between train and test.
+    walk_forward_params: dict[str, dict[str, int]] = field(default_factory=lambda: {
+        "rev_growth_quarterly_YoY": {
+            "min_train_quarters": 12,
+            "embargo_quarters": 1,
+            "target_horizon_quarters": 1,
+        },
+        "rev_growth_annual_FY": {
+            "min_train_quarters": 16,
+            "embargo_quarters": 4,
+            "target_horizon_quarters": 4,
+        },
+        "excess_return_12m_vs_spx_direction": {
+            "min_train_quarters": 16,
+            "embargo_quarters": 4,
+            "target_horizon_quarters": 4,
+        },
+    })
+
+    # --- Models (Req 6.5, 6.6) ---
+    # ElasticNet is the pre-registered primary model used for the published
+    # ML adjustment and empirical residual band. Ridge and LassoLars are
+    # reported only as appendix sensitivities. GradientBoosting is excluded
+    # entirely (overfitting risk at N approx 30).
+    primary_model: str = "elasticnet"
+    sensitivity_models: list[str] = field(
+        default_factory=lambda: ["ridge", "lassolars"]
+    )
+    model_hyperparameters: dict[str, dict] = field(default_factory=lambda: {
+        "elasticnet": {"alpha": 0.1, "l1_ratio": 0.5, "max_iter": 10000},
+        "ridge": {"alpha": 1.0, "max_iter": 10000},
+        "lassolars": {"alpha": 0.01, "max_iter": 10000, "normalize": False},
+    })
+
+    # --- Naive baselines per target (Req 6.7) ---
+    # Analyst consensus is NOT a baseline: historical revisions are
+    # unavailable from public sources. See Req 2 / Req 10 group E.
+    naive_baselines: dict[str, list[str]] = field(default_factory=lambda: {
+        "rev_growth_quarterly_YoY": [
+            "persistence",          # y_{t+1} = y_t
+            "seasonal_naive",       # y_{t+1} = y_{t-3} (same quarter last year)
+            "trailing_4q_mean",
+        ],
+        "rev_growth_annual_FY": [
+            "trailing_3y_mean",
+            "annual_persistence",   # next FY growth = current FY growth
+        ],
+        "excess_return_12m_vs_spx_direction": [
+            "coin_flip",            # 50-50
+            "always_positive",      # base rate from history
+        ],
+    })
+
+    # --- Tier thresholds (Req 7) ---
+    # Tier promotion gates. All conditions must be satisfied for the
+    # named tier; otherwise the tier defaults down. McNemar paired
+    # significance test (NOT aggregate binomial) per Req 7.
+    tier_thresholds: dict[str, dict[str, float]] = field(default_factory=lambda: {
+        "contributing": {
+            "min_n_oos": 25,
+            "min_directional_accuracy": 0.55,
+            "max_mcnemar_p": 0.20,
+            "min_r2": 0.0,
+            "min_auc": 0.55,
+            "min_mae_improvement_pct": 10.0,
+        },
+        "high_confidence": {
+            "min_n_oos": 30,
+            "min_directional_accuracy": 0.60,
+            "max_mcnemar_p": 0.10,
+            "min_r2": 0.05,
+            "min_auc": 0.60,
+            "min_mae_improvement_pct": 20.0,
+        },
+    })
+
+    # --- Adjustment weights (Req 8.2) ---
+    # Single source of truth on tier -> weight mapping.
+    # Used in horizon-mapped DCF adjustment per Req 8.1.
+    adjustment_weights: dict[str, float] = field(default_factory=lambda: {
+        "diagnostic": 0.0,
+        "contributing": 0.20,
+        "high_confidence": 0.35,
+    })
+
+    # --- N_OOS fallback for target-price adjustment (Req 8.5) ---
+    # If annual target N_OOS < this threshold, ML does NOT adjust target
+    # price; only the empirical residual band on the primary quarterly
+    # target is reported.
+    min_n_oos_for_target_price_adjust: int = 25
+
+    # --- Empirical residual band (Req 9) ---
+    # Pre-registered scaling method (Req 9.1a):
+    #   "A" = rolling 4-quarter aggregation (preferred default)
+    #   "B" = conservative 0.5x scaling
+    #   "C" = decoupled reporting (no DCF perturbation)
+    residual_scaling_method: str = "A"
+    bootstrap_n: int = 1000
+    bootstrap_min_n_residuals: int = 20  # below this, no band is produced
+
+    # --- Band-outcome thresholds (Req 11.1, mvp_path.md) ---
+    # Confidence-improving = band narrows by >= this fraction of DCF-only width.
+    # Risk-revealing = band widens by >= this fraction.
+    band_narrows_threshold_pct: float = 10.0
+    band_widens_threshold_pct: float = 10.0
+
+    # --- Model stability gates (Req 16) ---
+    # Automatic tier downgrades from residual diagnostics.
+    ljung_box_lags: list[int] = field(default_factory=lambda: [1, 2, 4])
+    ljung_box_alpha: float = 0.05
+    regime_split_max_mae_ratio: float = 1.30   # recent_half / earlier_half
+    rolling_window_size: int = 8
+    rolling_window_max_mae_ratio: float = 1.50  # recent_8 / earliest_8
+
+    # --- NLP coverage / QA (Req 3.6, 14) ---
+    nlp_coverage_active_threshold_pct: float = 60.0
+    nlp_proxy_qa_sample_size: int = 10
+    nlp_proxy_qa_min_relevant: int = 8
+    nlp_proxy_low_quality_max_rate_pct: float = 30.0
+
+    # --- Freshness gates (Req 5) ---
+    market_price_max_staleness_trading_days: int = 5
+    peer_financials_max_staleness_days: int = 30
+
+    # --- Reproducibility ---
+    random_seed: int = 42
+
+    def full_feature_columns(self) -> list[str]:
+        """Return the union of fundamentals + market + nlp groups.
+
+        This is the feature set used by every walk-forward and the ablation
+        full-model row. Analyst overlay fields are NOT included here and
+        never enter the ML training matrix (Req 2).
+        """
+        return (
+            self.feature_groups.get("fundamentals", [])
+            + self.feature_groups.get("market", [])
+            + self.feature_groups.get("nlp", [])
+        )
+
+    def canonical_dict(self) -> dict:
+        """Return a deterministic dict representation for hashing.
+
+        Used by the pre-registration provenance manifest (Req 12.5) to
+        compute a stable SHA256 of the MLConfig contents.
+        """
+        return {
+            "feature_groups": {
+                k: sorted(v) for k, v in self.feature_groups.items()
+            },
+            "analyst_overlay_fields": sorted(self.analyst_overlay_fields),
+            "target_definitions": dict(self.target_definitions),
+            "target_definitions_version": self.target_definitions_version,
+            "walk_forward_params": {
+                k: dict(v) for k, v in self.walk_forward_params.items()
+            },
+            "primary_model": self.primary_model,
+            "sensitivity_models": list(self.sensitivity_models),
+            "model_hyperparameters": {
+                k: dict(v) for k, v in self.model_hyperparameters.items()
+            },
+            "naive_baselines": {
+                k: list(v) for k, v in self.naive_baselines.items()
+            },
+            "tier_thresholds": {
+                k: dict(v) for k, v in self.tier_thresholds.items()
+            },
+            "adjustment_weights": dict(self.adjustment_weights),
+            "min_n_oos_for_target_price_adjust": self.min_n_oos_for_target_price_adjust,
+            "residual_scaling_method": self.residual_scaling_method,
+            "bootstrap_n": self.bootstrap_n,
+            "bootstrap_min_n_residuals": self.bootstrap_min_n_residuals,
+            "band_narrows_threshold_pct": self.band_narrows_threshold_pct,
+            "band_widens_threshold_pct": self.band_widens_threshold_pct,
+            "ljung_box_lags": list(self.ljung_box_lags),
+            "ljung_box_alpha": self.ljung_box_alpha,
+            "regime_split_max_mae_ratio": self.regime_split_max_mae_ratio,
+            "rolling_window_size": self.rolling_window_size,
+            "rolling_window_max_mae_ratio": self.rolling_window_max_mae_ratio,
+            "nlp_coverage_active_threshold_pct": self.nlp_coverage_active_threshold_pct,
+            "nlp_proxy_qa_sample_size": self.nlp_proxy_qa_sample_size,
+            "nlp_proxy_qa_min_relevant": self.nlp_proxy_qa_min_relevant,
+            "nlp_proxy_low_quality_max_rate_pct": self.nlp_proxy_low_quality_max_rate_pct,
+            "market_price_max_staleness_trading_days": self.market_price_max_staleness_trading_days,
+            "peer_financials_max_staleness_days": self.peer_financials_max_staleness_days,
+            "random_seed": self.random_seed,
+        }
+
+
+# ---------------------------------------------------------------------------
 # Validation and eligibility enums / data models (Reqs 14.1, 14.2, 17)
 # ---------------------------------------------------------------------------
 
@@ -212,6 +505,9 @@ class EngineConfig:
             "linear_trend",
         ]
     )
+
+    # --- v2 ML Layer (Reqs 6-12, 16; pre-registered per Milestone 0) ---
+    mlconfig: MLConfig = field(default_factory=MLConfig)
 
     # --- Valuation ---
     wacc: float = 0.10
