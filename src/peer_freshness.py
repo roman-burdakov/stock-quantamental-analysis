@@ -122,19 +122,31 @@ def _parse_date(value: Any) -> Optional[date]:
 
 
 def _trading_days_between(start: date, end: date) -> int:
-    """Approximate trading-day count between two dates (calendar days
-    × 5/7 minus weekends). Uses pandas business-day range for accuracy.
+    """Approximate trading-day count between two dates, accounting for
+    weekends AND US Federal market holidays (NYSE/Nasdaq closures).
 
-    Returns 0 if start > end.
+    Uses pandas USFederalHolidayCalendar via CustomBusinessDay, which
+    captures: New Year's Day, MLK Day, Presidents Day, Good Friday is
+    NOT a federal holiday but IS a market holiday — pandas does not
+    cover it; this is a documented residual error.
+
+    Returns 0 if start >= end.
     """
-    if start > end:
+    if start >= end:
         return 0
-    if start == end:
-        return 0
-    rng = pd.bdate_range(start=start, end=end)
-    # Subtract 1 because bdate_range is inclusive on both ends; we want
-    # the number of trading days *between* (exclusive of start, inclusive
-    # of end) for "how many trading days has it been since X".
+    try:
+        from pandas.tseries.holiday import USFederalHolidayCalendar
+        from pandas.tseries.offsets import CustomBusinessDay
+
+        cal = USFederalHolidayCalendar()
+        bday = CustomBusinessDay(calendar=cal)
+        rng = pd.date_range(start=start, end=end, freq=bday)
+    except (ImportError, AttributeError):
+        # Fall back to plain bdate_range if calendar import fails.
+        rng = pd.bdate_range(start=start, end=end)
+    # Subtract 1 because the range is inclusive on both ends; we want
+    # the number of trading days *between* start and end (exclusive of
+    # start, inclusive of end).
     return max(0, len(rng) - 1)
 
 
@@ -261,12 +273,15 @@ class MarketPriceFreshnessGate:
                 original_force = self.config.force_refresh
                 self.config.force_refresh = True
                 start = f"{self.config.start_fiscal_year}-01-01"
-                refreshed_prices = edgar_fetcher.fetch_market_prices(
-                    list(required_tickers),
-                    start=start,
-                    end=report_date,
-                )
-                self.config.force_refresh = original_force
+                try:
+                    refreshed_prices = edgar_fetcher.fetch_market_prices(
+                        list(required_tickers),
+                        start=start,
+                        end=report_date,
+                    )
+                finally:
+                    # Always restore force_refresh, even if fetch raised.
+                    self.config.force_refresh = original_force
                 if refreshed_prices is not None and not refreshed_prices.empty:
                     market_prices = refreshed_prices
                     refreshed = list(required_tickers)
@@ -407,8 +422,11 @@ class PeerFinancialsFreshnessGate:
             try:
                 original_force = self.config.force_refresh
                 self.config.force_refresh = True
-                refreshed_df = edgar_fetcher.fetch_peer_financials(peers_checked)
-                self.config.force_refresh = original_force
+                try:
+                    refreshed_df = edgar_fetcher.fetch_peer_financials(peers_checked)
+                finally:
+                    # Always restore force_refresh, even if fetch raised.
+                    self.config.force_refresh = original_force
                 if refreshed_df is not None and not refreshed_df.empty:
                     peer_financials = refreshed_df
                     refreshed = peers_checked

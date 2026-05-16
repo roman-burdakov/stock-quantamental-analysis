@@ -449,10 +449,15 @@ class AnalystEstimateFetcher:
             if snapshot.revenue_growth_next_yr is not None
             else snapshot.revenue_growth_curr_yr
         )
-        if ml_prediction is None or analyst is None or not snapshot.fetch_succeeded:
+        # Guard against None AND NaN — a NaN from yfinance would silently
+        # propagate through arithmetic and produce nonsensical output
+        # (delta_pp=NaN, direction='ml_below' from sign comparison).
+        ml_invalid = ml_prediction is None or _isnan(ml_prediction)
+        analyst_invalid = analyst is None or _isnan(analyst)
+        if ml_invalid or analyst_invalid or not snapshot.fetch_succeeded:
             return AnalystOverlay(
-                ml_growth=ml_prediction,
-                analyst_growth=analyst,
+                ml_growth=None if ml_invalid else ml_prediction,
+                analyst_growth=None if analyst_invalid else analyst,
                 delta_pp=None,
                 direction="unavailable",
                 magnitude="unavailable",

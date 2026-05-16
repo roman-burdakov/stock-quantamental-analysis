@@ -157,26 +157,55 @@ class FilingTextParser:
         """Return the first ~10,000 chars of cleaned filing text as an
         mda_proxy fallback (Req 3.2).
 
-        The proxy attempts to skip the cover page / TOC and start where
-        the filing's narrative actually begins. Heuristic: drop everything
-        before the first occurrence of "PART I" or "Item 1.", then take
-        up to 10,000 characters from there.
+        Heuristic, in order of preference:
 
-        Returns None if the resulting candidate is too short to be
-        usable (< 500 chars), so the section remains marked ``missing``.
+        1. Find anchor candidates (``PART I``, ``Item 1.``, ``Item 2.``).
+        2. Reject candidates that appear inside a table of contents.
+           A TOC entry is identified by the presence of dot-leader
+           patterns (``........``) or trailing page numbers in the
+           same line. Body headings are followed by paragraph text.
+        3. Pick the FIRST surviving (non-TOC) candidate. This is
+           typically the actual narrative-section heading.
+        4. If no non-TOC candidate exists, fall back to the LAST
+           candidate (which is at minimum past the TOC).
+        5. The candidate must produce ≥500 chars after stripping.
 
         Quality is gated separately by ``check_proxy_quality()`` against
         a list of MD&A indicator terms (Req 14.1).
         """
         if not plain_text:
             return None
-        # Skip cover page / TOC to first PART/Item heading
-        anchor = re.search(
+        anchor_pattern = re.compile(
             r"\n\s*(?:PART\s+I|Item\s+1\.|Item\s+2\.)",
-            plain_text,
             re.IGNORECASE,
         )
-        start = anchor.start() if anchor else 0
+        anchors = list(anchor_pattern.finditer(plain_text))
+        if not anchors:
+            return None
+
+        # TOC detector: an anchor is "in TOC" if the line containing it
+        # has a dot-leader run (>=4 dots) OR a trailing page-number.
+        toc_line_pattern = re.compile(
+            r"\.{4,}|\b\d{1,4}\s*$",
+        )
+
+        non_toc = []
+        for m in anchors:
+            # Extract the line the anchor is on.
+            line_start = plain_text.rfind("\n", 0, m.start()) + 1
+            line_end = plain_text.find("\n", m.end())
+            line = plain_text[line_start : (line_end if line_end != -1 else len(plain_text))]
+            if not toc_line_pattern.search(line):
+                non_toc.append(m)
+
+        if non_toc:
+            anchor = non_toc[0]
+        else:
+            # All matches are in TOC; fall back to the last one and hope
+            # the body section follows immediately.
+            anchor = anchors[-1]
+
+        start = anchor.start()
         candidate = plain_text[start : start + 10_000].strip()
         if len(candidate) < 500:
             return None

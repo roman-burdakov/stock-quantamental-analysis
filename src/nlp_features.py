@@ -242,6 +242,26 @@ class NLPFeatureExtractor:
         text. For example, "high" registers as positive in VADER but is
         neutral in financial filings ("high cost of capital"). LM is the
         academic standard for 10-K/10-Q sentiment analysis.
+
+        Documented limitations (inherent to lexicon-based sentiment, NOT
+        bugs in this implementation):
+
+        - Negation is not handled. ``"not strong"`` scores positive
+          because ``"strong"`` is in the positive list and the lexicon
+          does not see ``"not"``. Loughran & McDonald (2011) addresses
+          this via a separate negation lexicon; we do not implement that.
+        - Compound expressions cancel out. ``"record losses"`` scores 0
+          because ``"record"`` (positive) and ``"losses"`` (negative)
+          balance. A savvy reader knows the phrase is bad; the lexicon
+          can't see the dependency.
+        - Financial polysemy: ``"declining costs"`` is good operationally
+          but ``"declining"`` is in the LM negative list. The score will
+          be negative for this phrase.
+
+        These limitations make sentiment a noisy feature; downstream ML
+        validation determines whether the signal-to-noise ratio is high
+        enough to keep it. If the ablation shows sentiment hurts model
+        performance, it should be dropped from the active feature set.
         """
         if not text:
             return 0.0
