@@ -14,7 +14,7 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
 
 ## Milestone 0: MLConfig Pre-Registration (DO FIRST) — [MVP-E]
 
-- [ ] **0.1** [MVP-E] Create `MLConfig` dataclass in `src/config.py`
+- [x] **0.1** [MVP-E] Create `MLConfig` dataclass in `src/config.py`
   - Fields: `feature_groups: dict[str, list[str]]`, `model_hyperparameters: dict`, `walk_forward: dict[str, dict]`, `tier_thresholds: dict`, `adjustment_weights: dict`, `bootstrap_n: int = 1000`, `random_seed: int = 42`
   - `feature_groups` keys: `"fundamentals"`, `"market"`, `"nlp"`, `"full_no_analyst"` — these are the only ML feature groups. Analyst data is **never** an ML feature. The analyst overlay payload (used by `compare_to_analyst_overlay`) is stored separately in `MLConfig.analyst_overlay_fields` (a list of field names extracted from `AnalystSnapshot` for the report comparator), NOT in `feature_groups`.
   - `model_hyperparameters["elasticnet"]`: `{alpha: 0.1, l1_ratio: 0.5, max_iter: 10000}`
@@ -26,7 +26,7 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
   - **Acceptance:** Tests instantiate `MLConfig` with default values; values match Req 7 and Req 8.1 exactly
   - **Reqs:** 12.1, 12.2
 
-- [ ] **0.2** Add `MLConfig` git commit gate to `run_pipeline.py`
+- [x] **0.2** Add `MLConfig` git commit gate to `run_pipeline.py`
   - At ml_v2 stage entry, log the git SHA of `src/config.py` and the commit timestamp
   - Write to `outputs/ml_config_provenance.json`
   - **Acceptance:** Output file contains SHA and timestamp; populated even if pipeline fails downstream
@@ -36,20 +36,20 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
 
 ## Milestone 1: Data Foundation Refresh
 
-- [ ] **1.1** Add `^SOX` and `^GSPC` to `EdgarFetcher.fetch_market_prices()`
+- [x] **1.1** Add `^SOX` and `^GSPC` to `EdgarFetcher.fetch_market_prices()`
   - Update default ticker list in `EngineConfig` to include `["^SOX", "^GSPC"]`
   - Verify yfinance returns prices for these tickers from 2014-01-01 onward
   - **Acceptance:** `data/raw/market_prices.csv` contains rows with `ticker ∈ {^SOX, ^GSPC}`; row count for these tickers ≥ 2,500 each
   - **Reqs:** 4.1
 
-- [ ] **1.2** [MVP-E] Implement `src/peer_freshness.py` with **two gates**: `MarketPriceFreshnessGate` (for ML) and `PeerFinancialsFreshnessGate` (for valuation)
+- [x] **1.2** [MVP-E] Implement `src/peer_freshness.py` with **two gates**: `MarketPriceFreshnessGate` (for ML) and `PeerFinancialsFreshnessGate` (for valuation)
   - `MarketPriceFreshnessGate.evaluate_and_refresh()`: trigger market_prices refresh if any required ticker (NVDA, ^SOX, ^GSPC, peers) is more than 5 trading days behind report_date; block ML stage entirely if NVDA is stale
   - `PeerFinancialsFreshnessGate.evaluate_and_refresh()`: trigger peer_financials refresh if max age > 30 days; per-peer exclusion still > 30 days; block valuation peer multiples if ≥3/5 core peers excluded
   - Write reports to `outputs/market_price_freshness_report.json` and `outputs/peer_financials_freshness_report.json`
   - **Acceptance:** Unit tests cover both gates with synthetic stale and fresh data; market gate blocks NVDA-stale case; peer-financials gate independent of price freshness
   - **Reqs:** 5.1–5.10
 
-- [ ] **1.3** [MVP-X] Implement `src/analyst_estimates.py` with `AnalystEstimateFetcher` — **decision-time overlay only, NOT an ML feature**
+- [x] **1.3** [MVP-X] Implement `src/analyst_estimates.py` with `AnalystEstimateFetcher` — **decision-time overlay only, NOT an ML feature**
   - `fetch_snapshot(ticker, retrieval_date)` returns `AnalystSnapshot`
   - `render_overlay_summary(snapshot, ml_prediction)` returns dict with comparator narrative (analyst growth, ml growth, delta_pp, direction, magnitude)
   - **No `to_features()` method.** Analyst data is never converted to ML features and never enters the training matrix.
@@ -58,7 +58,7 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
   - **Acceptance:** Unit test asserts `AnalystEstimateFetcher` does not expose any `to_features` method; snapshot is consumed only by `render_overlay_summary` for the report comparator
   - **Reqs:** 2.1, 2.2, 2.3, 2.4, 2.7
 
-- [ ] **1.4** Tests for Milestone 1
+- [x] **1.4** Tests for Milestone 1
   - `tests/test_peer_freshness.py`: stale detection, refresh trigger, exclusion logic, blocked-status logic
   - `tests/test_analyst_estimates.py`: schema parsing, missing-field handling, cache file format
   - **Acceptance:** All tests pass; `pytest tests/test_peer_freshness.py tests/test_analyst_estimates.py` exits 0
@@ -68,14 +68,14 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
 
 ## Milestone 2: NLP Coverage Recovery
 
-- [ ] **2.1** Identify and re-fetch empty filing stubs
+- [x] **2.1** Identify and re-fetch empty filing stubs
   - Scan `data/interim/sections_*.json` for files < 1KB (currently 30 of 46)
   - For each stub, check `data/raw/filings/<accession>.html` exists and is well-formed (>100KB and contains `<body>`)
   - Re-fetch HTML via `EdgarFetcher.fetch_filing_document()` if missing or malformed
   - **Acceptance:** After re-fetch, ≤5 of 46 cached HTMLs are still problematic (logged as `fetch_failed_persistent`)
   - **Reqs:** 3.1, 3.2
 
-- [ ] **2.2** Improve `src/filing_text_parser.py` for 10-Q
+- [x] **2.2** Improve `src/filing_text_parser.py` for 10-Q
   - Add 10-Q-specific section labels: `"Part I, Item 2"` (MD&A) and `"Part II, Item 1A"` (Risk Factors)
   - Add fallback method `_extract_mda_proxy(html)`: clean HTML, return first 10,000 chars of body text
   - Track quality tier: `full_extraction` | `partial_extraction` | `mda_proxy_fallback` | `failed`
@@ -83,14 +83,14 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
   - **Acceptance:** After re-running on the 46 cached filings, ≥70% have tier ≥ `mda_proxy_fallback`
   - **Reqs:** 3.2, 3.3
 
-- [ ] **2.3** Add sentiment feature to `src/nlp_features.py`
+- [x] **2.3** Add sentiment feature to `src/nlp_features.py`
   - Use `textblob.TextBlob(text).sentiment.polarity` (range −1 to +1)
   - For each filing's MD&A: compute polarity; for prior filing: compute polarity; delta = current − prior
   - Add columns `sentiment_polarity`, `sentiment_delta` to NLP features output
   - **Acceptance:** `nvda_nlp_features.csv` gains the two columns; values in [−1, 1] for non-null rows
   - **Reqs:** 3.4
 
-- [ ] **2.4** Tests for Milestone 2
+- [x] **2.4** Tests for Milestone 2
   - `tests/test_nlp_coverage.py`: assert ≥70% extraction tier coverage on cached filings; assert sentiment in valid range
   - `tests/test_filing_text_parser.py`: per-form-type extraction; fallback proxy logic
   - **Reqs:** 3.3, 3.4
@@ -306,7 +306,7 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
   - **Acceptance:** Report passes manual review with no factual contradictions
   - **Reqs:** 13
 
-- [ ] **8.5** [MVP-E] Cross-file consistency test (NEW — guards against terminology drift)
+- [x] **8.5** [MVP-E] Cross-file consistency test (NEW — guards against terminology drift)
   - Create `tests/test_v2_spec_consistency.py` and `scripts/check_v2_consistency.sh`
   - The shell script greps the spec directory and the implemented source code for stale terms that should never appear in v2 outputs:
     - Banned in implementation code and report templates: `binomial_p_vs_naive`, `bootstrap_ci_low`, `bootstrap_ci_high`, `bootstrap_target_price_ci`, `decision_with_analyst`, `to_features` (in any class derived from analyst), `90% interval`, `90% confidence interval`, `confidence interval` (when applied to bootstrap output), `confidence-band` (use `empirical residual band` instead), `analyst_consensus_baseline` / `analyst_baseline` (analyst data is overlay only, never a walk-forward baseline)

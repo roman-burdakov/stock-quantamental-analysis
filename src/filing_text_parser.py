@@ -92,33 +92,128 @@ class FilingTextParser:
           1. Strip HTML to plain text.
           2. For each target section, try Item-number regex (primary).
           3. Fall back to section-title matching if regex misses.
-          4. Build TextSectionRecord per section.
-          5. Save extracted text to data/interim/.
+          4. If both fail, fall back to mda_proxy: first ~10,000 chars of
+             cleaned filing text after the header (Req 3.2).
+          5. Build TextSectionRecord per section.
+          6. Save extracted text to data/interim/.
+
+        Each record carries an ``extraction_tier`` attribute:
+          - ``full_extraction``: Item-number regex succeeded
+          - ``partial_extraction``: title fallback succeeded
+          - ``mda_proxy_fallback``: proxy text returned (only for mda)
+          - ``failed``: nothing usable found
+
+        Reqs: 3.1–3.6, 14 (extraction quality).
         """
         plain_text = self._strip_html(html)
         sections = self._sections_for_form(form_type)
 
         results: list[TextSectionRecord] = []
+        # Pre-compute proxy text once per filing so all sections can share it.
+        proxy_text = self._build_mda_proxy(plain_text)
+
         for section_name, item_label in sections.items():
-            text, status = self._extract_section(
+            text, status, tier = self._extract_section(
                 plain_text, item_label, form_type
             )
+            # Apply mda_proxy_fallback to the MD&A section when:
+            #  - extraction is missing entirely, OR
+            #  - extraction is suspiciously short (< 500 chars) which
+            #    typically indicates the regex/title matched a TOC entry
+            #    rather than the full narrative section.
+            mda_min_chars = self.config.min_nlp_char_mda
+            if section_name == "mda" and proxy_text is not None:
+                if status == "missing" or len(text) < mda_min_chars:
+                    text = proxy_text
+                    status = "fallback"
+                    tier = "mda_proxy_fallback"
+
             char_count = len(text)
-            results.append(
-                TextSectionRecord(
-                    accession_number=accession,
-                    form_type=form_type,
-                    section_name=section_name,
-                    text=text,
-                    char_count=char_count,
-                    filing_date=filing_date,
-                    source_available_date=source_available_date,
-                    parse_status=status,
-                )
+            record = TextSectionRecord(
+                accession_number=accession,
+                form_type=form_type,
+                section_name=section_name,
+                text=text,
+                char_count=char_count,
+                filing_date=filing_date,
+                source_available_date=source_available_date,
+                parse_status=status,
             )
+            # extraction_tier is a v2 addition. Set as a dynamic attribute
+            # to avoid changing the v1 dataclass schema (which would break
+            # existing tests). Downstream readers can use getattr(rec,
+            # "extraction_tier", None) and gracefully handle the v1 case.
+            record.extraction_tier = tier  # type: ignore[attr-defined]
+            results.append(record)
 
         self._save_sections(results, accession)
         return results
+
+    # ------------------------------------------------------------------
+    # MD&A proxy fallback (Req 3.2)
+    # ------------------------------------------------------------------
+
+    def _build_mda_proxy(self, plain_text: str) -> str | None:
+        """Return the first ~10,000 chars of cleaned filing text as an
+        mda_proxy fallback (Req 3.2).
+
+        The proxy attempts to skip the cover page / TOC and start where
+        the filing's narrative actually begins. Heuristic: drop everything
+        before the first occurrence of "PART I" or "Item 1.", then take
+        up to 10,000 characters from there.
+
+        Returns None if the resulting candidate is too short to be
+        usable (< 500 chars), so the section remains marked ``missing``.
+
+        Quality is gated separately by ``check_proxy_quality()`` against
+        a list of MD&A indicator terms (Req 14.1).
+        """
+        if not plain_text:
+            return None
+        # Skip cover page / TOC to first PART/Item heading
+        anchor = re.search(
+            r"\n\s*(?:PART\s+I|Item\s+1\.|Item\s+2\.)",
+            plain_text,
+            re.IGNORECASE,
+        )
+        start = anchor.start() if anchor else 0
+        candidate = plain_text[start : start + 10_000].strip()
+        if len(candidate) < 500:
+            return None
+        return candidate
+
+    @staticmethod
+    def check_proxy_quality(text: str) -> tuple[bool, dict[str, int]]:
+        """Heuristic quality check on a fallback proxy extraction.
+
+        Returns ``(is_relevant, term_counts)`` where ``is_relevant`` is
+        True iff at least one MD&A indicator term appears in the text.
+        ``term_counts`` is a dict of indicator → count for transparency.
+
+        Indicator terms (Req 14.1): ``revenue``, ``results of operations``,
+        ``net income``, ``gross margin``, ``compared to``, ``quarter``,
+        ``fiscal year``.
+
+        This is the automated, deterministic half of Req 14. The manual
+        QA workflow (Req 14.2/14.3) writes 10 sample fallback extractions
+        for human review and only allows NLP to be active when at least
+        8/10 are labeled relevant.
+        """
+        if not text:
+            return False, {}
+        indicators = [
+            "revenue",
+            "results of operations",
+            "net income",
+            "gross margin",
+            "compared to",
+            "quarter",
+            "fiscal year",
+        ]
+        lowered = text.lower()
+        counts = {t: lowered.count(t) for t in indicators}
+        is_relevant = any(c > 0 for c in counts.values())
+        return is_relevant, counts
 
     def check_extraction_quality(
         self,
@@ -263,19 +358,26 @@ class FilingTextParser:
 
     def _extract_section(
         self, text: str, item_label: str, form_type: str
-    ) -> tuple[str, str]:
-        """Try Item-number regex, then title fallback."""
+    ) -> tuple[str, str, str]:
+        """Try Item-number regex, then title fallback.
+
+        Returns ``(text, status, tier)`` where:
+        - ``status`` ∈ {"success", "fallback", "missing"} — preserved for
+          v1 API compatibility (parse_status field)
+        - ``tier`` ∈ {"full_extraction", "partial_extraction", "failed"} —
+          v2 extraction-quality tier (Req 3.3)
+        """
         # Primary: Item-number regex (Req 5.3)
         extracted = self._extract_by_item_number(text, item_label, form_type)
         if extracted and len(extracted.strip()) > 50:
-            return extracted.strip(), "success"
+            return extracted.strip(), "success", "full_extraction"
 
         # Fallback: section-title matching
         extracted = self._extract_by_title_fallback(text, item_label)
         if extracted and len(extracted.strip()) > 50:
-            return extracted.strip(), "fallback"
+            return extracted.strip(), "fallback", "partial_extraction"
 
-        return "", "missing"
+        return "", "missing", "failed"
 
     # ------------------------------------------------------------------
     # Primary extraction: Item-number regex
@@ -459,6 +561,7 @@ class FilingTextParser:
                 "filing_date": r.filing_date,
                 "source_available_date": r.source_available_date,
                 "parse_status": r.parse_status,
+                "extraction_tier": getattr(r, "extraction_tier", None),
                 "text": r.text,
             }
             for r in records

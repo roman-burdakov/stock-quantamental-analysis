@@ -124,6 +124,191 @@ class NLPFeatureExtractor:
 
         return scores
 
+    # ------------------------------------------------------------------
+    # Sentiment polarity (Req 3.4 — v2 Task 2.3)
+    # ------------------------------------------------------------------
+
+    # Loughran-McDonald-style financial sentiment lexicon. We embed a
+    # high-signal subset rather than depending on textblob/vader which are
+    # trained on social media / movie reviews and consistently misclassify
+    # words like "decline" or "concern" as neutral and "high" as positive.
+    # The full LM dictionary has ~10K entries; this distilled subset
+    # captures the most common terms in 10-K/10-Q filings.
+
+    _LM_POSITIVE: tuple[str, ...] = (
+        "achieve", "achievement", "achieved", "accomplish", "accomplished",
+        "advantage", "advantageous", "advance", "advances", "advancing",
+        "beneficial", "benefit", "benefited", "benefits",
+        "boost", "boosted", "breakthrough", "compelling",
+        "confidence", "confident", "constructive", "delight", "delighted",
+        "deserved", "desirable", "despite", "drives", "driving",
+        "effective", "efficient", "enable", "enabled", "enables", "enabling",
+        "encourage", "encouraged", "encouraging", "enhance", "enhanced",
+        "enhancement", "enhances", "enhancing", "enjoy", "enjoyed",
+        "enthusiasm", "exceed", "exceeded", "exceeding", "exceeds",
+        "excellent", "excellence", "exceptional", "exceptionally",
+        "expand", "expanded", "expanding", "expansion",
+        "favorable", "favorably", "favored", "fortunate", "fortunately",
+        "gain", "gained", "gaining", "gains", "good",
+        "great", "greatly", "greatness", "growth",
+        "highest", "ideal", "ideally", "improve", "improved", "improvement",
+        "improvements", "improves", "improving", "innovate", "innovation",
+        "innovative", "lead", "leader", "leadership", "leading", "leads",
+        "outperform", "outperformed", "outperforming", "outperforms",
+        "popular", "popularity", "popularize", "positive", "positively",
+        "premier", "premium", "profitable", "profitably", "profits",
+        "progress", "promising", "prosper", "prosperity", "prosperous",
+        "rebound", "rebounded", "record", "recovered", "recovery",
+        "regain", "regained", "rejuvenated", "reward", "rewarded",
+        "satisfaction", "satisfied", "satisfy", "satisfying",
+        "stability", "stable", "stabilize", "stabilized",
+        "strength", "strengthen", "strengthened", "strengthening",
+        "strengthens", "strong", "stronger", "strongest", "strongly",
+        "succeed", "succeeded", "success", "successes", "successful",
+        "successfully", "superior", "surpass", "surpassed", "surpasses",
+        "surpassing", "transformational", "tremendous", "tremendously",
+        "unprecedented", "valuable", "wealth", "winner", "winning",
+    )
+
+    _LM_NEGATIVE: tuple[str, ...] = (
+        "abandoned", "abandonment", "abandoning", "adverse", "adversely",
+        "adversity", "alleged", "anomaly", "anomalies",
+        "challenge", "challenged", "challenges", "challenging",
+        "claim", "claimed", "claims", "complaint", "complaints",
+        "concern", "concerned", "concerns", "constrain", "constrained",
+        "constraints", "contraction", "contracted", "contractions",
+        "crisis", "critical", "criticism", "criticized", "damage", "damaged",
+        "damages", "danger", "dangerous", "decline", "declined", "declines",
+        "declining", "decrease", "decreased", "decreases", "decreasing",
+        "deficient", "deficiency", "deficiencies", "deficit", "deficits",
+        "delayed", "delays", "deplete", "depleted", "depletion",
+        "deteriorate", "deteriorated", "deterioration", "difficult",
+        "difficulties", "difficulty", "diminish", "diminished",
+        "diminishing", "disappoint", "disappointed", "disappointing",
+        "disappointment", "disclose", "disclosed", "discrepancy",
+        "disrupt", "disrupted", "disrupting", "disruption", "disruptions",
+        "disruptive", "doubt", "doubted", "doubtful", "downgrade",
+        "downturn", "downturns", "drag", "dragged", "dropping",
+        "erratic", "erode", "eroded", "erosion", "exacerbate", "exacerbated",
+        "exposure", "fail", "failed", "failing", "fails", "failure",
+        "failures", "fall", "fallen", "falls", "fault", "faulty", "fear",
+        "fears", "force", "forced", "fraud", "fraudulent",
+        "harm", "harmed", "harmful", "headwind", "headwinds",
+        "hinder", "hindered", "hindering",
+        "impair", "impaired", "impairment", "impairments",
+        "imposed", "improper", "improperly", "inability", "inadequate",
+        "inadequately", "indictment", "ineffective", "inefficiencies",
+        "inefficient", "inferior", "infringe", "infringed", "infringement",
+        "insufficient", "insufficiency", "interfere", "interference",
+        "interrupted", "interruption", "interruptions",
+        "lacking", "lawsuit", "lawsuits", "litigation", "loss", "losses",
+        "lost", "low", "lower", "lowered", "lowering", "lowest",
+        "miss", "missed", "missing", "negative", "negatively",
+        "obstacle", "obstacles", "obsolete", "obsolescence", "obstruction",
+        "penalize", "penalized", "penalty", "penalties", "poor", "poorly",
+        "pressure", "pressures", "problem", "problematic", "problems",
+        "recall", "recalled", "recession", "recessionary",
+        "regret", "regretfully", "restate", "restated", "restatement",
+        "risk", "risks", "risky", "ruin", "ruined", "scrutiny",
+        "setback", "setbacks", "shortfall", "shortfalls", "shortage",
+        "shortages", "slow", "slowdown", "slowdowns", "slowed", "slower",
+        "slowing", "slumped", "stagnant", "stagnation", "stop", "stopped",
+        "subpoena", "suffer", "suffered", "suffering",
+        "sued", "suing", "suspended", "suspension",
+        "terminate", "terminated", "termination", "threat", "threats",
+        "tough", "trouble", "troubled", "troubles", "troubling",
+        "uncertain", "uncertainty", "uncertainties", "unattractive",
+        "uncompetitive", "undesirable", "undermined", "undermining",
+        "unexpected", "unexpectedly", "unfavorable", "unfavorably",
+        "unfortunate", "unfortunately", "unstable", "unsuccessful",
+        "violate", "violated", "violation", "violations",
+        "vulnerable", "vulnerability", "warn", "warned", "warning",
+        "warnings", "weak", "weaken", "weakened", "weakening", "weaker",
+        "weakness", "weaknesses", "worse", "worsen", "worsened",
+        "worsening", "worst",
+    )
+
+    def compute_sentiment_polarity(self, text: str) -> float:
+        """Compute normalized sentiment polarity in [-1, +1] using the
+        Loughran-McDonald financial-domain lexicon (Req 3.4).
+
+        Returns ``(pos - neg) / (pos + neg + 1)`` where pos/neg are
+        word-boundary-anchored counts of the embedded LM positive and
+        negative word lists. The +1 in the denominator is a smoother that
+        keeps the score finite when both counts are zero.
+
+        Why a financial-domain lexicon: TextBlob and VADER are trained on
+        movie reviews and social media and consistently mislabel financial
+        text. For example, "high" registers as positive in VADER but is
+        neutral in financial filings ("high cost of capital"). LM is the
+        academic standard for 10-K/10-Q sentiment analysis.
+        """
+        if not text:
+            return 0.0
+        lowered = text.lower()
+        pos = 0
+        neg = 0
+        for word in self._LM_POSITIVE:
+            pattern = re.compile(r"\b" + re.escape(word) + r"\b")
+            pos += len(pattern.findall(lowered))
+        for word in self._LM_NEGATIVE:
+            pattern = re.compile(r"\b" + re.escape(word) + r"\b")
+            neg += len(pattern.findall(lowered))
+        if pos + neg == 0:
+            return 0.0
+        return round((pos - neg) / (pos + neg + 1), 6)
+
+    def compute_sentiment_delta(
+        self, sections: list[TextSectionRecord]
+    ) -> pd.DataFrame:
+        """Compute per-filing sentiment_polarity and sentiment_delta
+        (current vs prior filing of the same section type).
+
+        Returns a DataFrame ready for inclusion in the NLP feature
+        matrix, with columns matching NLPFeatureRecord schema.
+        """
+        rows: list[dict] = []
+        # Sort by section then date for deterministic prior-filing pairing
+        by_section: dict[str, list[TextSectionRecord]] = {}
+        for s in sections:
+            by_section.setdefault(s.section_name, []).append(s)
+        for section_name, recs in by_section.items():
+            recs_sorted = sorted(recs, key=lambda r: r.filing_date)
+            prev_polarity: float | None = None
+            prev_filing_date: str | None = None
+            for r in recs_sorted:
+                polarity = self.compute_sentiment_polarity(r.text)
+                # Polarity feature
+                rows.append(
+                    {
+                        "filing_date": r.filing_date,
+                        "source_available_date": r.source_available_date,
+                        "source_accession": r.accession_number,
+                        "section": section_name,
+                        "feature_type": "sentiment",
+                        "feature_name": "sentiment_polarity",
+                        "value": polarity,
+                        "prev_filing_date": prev_filing_date,
+                    }
+                )
+                # Delta feature (only after first observation)
+                if prev_polarity is not None:
+                    rows.append(
+                        {
+                            "filing_date": r.filing_date,
+                            "source_available_date": r.source_available_date,
+                            "source_accession": r.accession_number,
+                            "section": section_name,
+                            "feature_type": "sentiment",
+                            "feature_name": "sentiment_delta",
+                            "value": round(polarity - prev_polarity, 6),
+                            "prev_filing_date": prev_filing_date,
+                        }
+                    )
+                prev_polarity = polarity
+                prev_filing_date = r.filing_date
+        return pd.DataFrame(rows)
+
     def compute_narrative_drift(
         self, sections: list[TextSectionRecord]
     ) -> pd.DataFrame:
@@ -169,6 +354,15 @@ class NLPFeatureExtractor:
                         "prev_filing_date": None,
                     }
                 )
+
+        # --- Sentiment features (Req 3.4 — v2 Task 2.3) ---
+        # Compute Loughran-McDonald polarity and per-section delta vs
+        # prior filing. This produces sentiment_polarity (level) and
+        # sentiment_delta (change) for every section that has text.
+        sent_df = self.compute_sentiment_delta(sections)
+        if not sent_df.empty:
+            for _, row in sent_df.iterrows():
+                records.append(row.to_dict())
 
         # --- Optional: Embedding distances (17.1) ---
         if self.config.use_embeddings:
