@@ -460,6 +460,12 @@ class EngineConfig:
     ai_capex_context: list[str] = field(
         default_factory=lambda: ["MSFT", "AMZN", "GOOGL", "META"]
     )
+    # Market index tickers (Req 4.1) — fetched alongside NVDA/peers for
+    # ML market-feature construction (excess returns vs SOX, vs S&P 500).
+    # ^SOX = Philadelphia Semiconductor Index; ^GSPC = S&P 500.
+    index_tickers: list[str] = field(
+        default_factory=lambda: ["^SOX", "^GSPC"]
+    )
     peer_justifications: dict[str, str] = field(default_factory=lambda: {
         "AMD": "Direct GPU/CPU competitor in data-center accelerators",
         "AVGO": "Broadcom — networking/custom-silicon peer, AI infrastructure",

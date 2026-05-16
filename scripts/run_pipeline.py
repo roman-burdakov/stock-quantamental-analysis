@@ -232,6 +232,7 @@ def run_ingest(config: EngineConfig, state: PipelineState) -> None:
         + config.core_semiconductor_peers
         + config.infrastructure_peers
         + config.ai_capex_context
+        + config.index_tickers
     )
     state.market_prices = fetcher.fetch_market_prices(
         all_tickers,
