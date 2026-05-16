@@ -77,26 +77,48 @@ def _git_head_sha(repo_root: Path) -> str:
     return _run_git(["rev-parse", "HEAD"], repo_root)
 
 
+def _is_code_path(path: str) -> bool:
+    """Return True if a path represents source code that affects ML behaviour.
+
+    Pre-registration cares about code state, not data state. Pipeline-
+    generated artifacts (CSVs in data/processed/, JSON/MD/PDF in outputs/)
+    are explicitly NOT code: they may be uncommitted between runs without
+    invalidating the pre-registration claim.
+    """
+    code_prefixes = ("src/", "scripts/", "tests/")
+    code_suffixes = (".py", ".sh", ".j2", ".md.j2", ".css")
+    # Spec docs in .kiro/specs/ are also code-like (they govern behaviour).
+    spec_prefix = ".kiro/specs/"
+    if path.startswith(spec_prefix):
+        return True
+    if not path.startswith(code_prefixes):
+        return False
+    return path.endswith(code_suffixes)
+
+
 def _git_dirty_status(repo_root: Path) -> tuple[bool, list[str]]:
     """Return (dirty: bool, list of dirty file paths).
 
-    For pre-registration purposes, the working tree is "dirty" if either:
-    - Any tracked file has uncommitted modifications or staged changes, OR
-    - There are any UNTRACKED files matching ``src/*.py`` or
-      ``scripts/*.py`` (new source code that has not been committed yet
-      could affect ML behaviour).
+    For pre-registration purposes, the working tree is "code-dirty" if
+    either of the following is true:
+    - Any tracked CODE file (src/, scripts/, tests/, .kiro/specs/) has
+      uncommitted modifications or staged changes, OR
+    - There are any UNTRACKED files matching ``src/*.py``,
+      ``scripts/*.{py,sh}``, or ``.kiro/specs/**`` (new code that has not
+      been committed yet could affect ML behaviour).
 
-    Generated data files (``data/processed/*.csv`` etc.) and gitignored
-    paths are intentionally NOT counted, because pre-registration is a
-    code-state question, not a data-state question.
+    Pipeline-generated artifacts (``data/processed/*.csv``,
+    ``outputs/**``) and gitignored paths are intentionally NOT counted,
+    because pre-registration is a code-state question, not a data-state
+    question. The complete dirty list (code + data) is still returned in
+    ``git_dirty_files`` for full transparency, but ``git_dirty`` and the
+    pre-registration gate flip only on code-dirty.
 
     The git porcelain v1 format is ``XY filename`` where XY is a
     2-character status code. We must NOT strip the output: the leading
     space in codes like " M" or "??" is part of the format.
     """
     try:
-        # untracked-files=normal so we can see new src/scripts files,
-        # but we filter the untracked entries ourselves below.
         result = subprocess.run(
             ["git", "status", "--porcelain", "--untracked-files=normal"],
             cwd=str(repo_root),
@@ -113,33 +135,37 @@ def _git_dirty_status(repo_root: Path) -> tuple[bool, list[str]]:
     if not output.strip():
         return (False, [])
 
-    dirty_files: list[str] = []
+    all_dirty: list[str] = []
+    code_dirty: list[str] = []
     for line in output.splitlines():
         if len(line) <= 3:
             continue
         status_code = line[:2]
         path = line[3:]
-        # Tracked-file modifications: any non-"??" status code is dirty.
+        all_dirty.append(path)
+        # Tracked-file modifications: include any code-path change.
         if status_code != "??":
-            dirty_files.append(path)
+            if _is_code_path(path):
+                code_dirty.append(path)
             continue
-        # Untracked files: only count Python source under src/ or scripts/.
-        # Trailing slash (directory) is treated as one entry covering all
-        # untracked Python files inside it.
+        # Untracked: only count Python/shell source under src/, scripts/,
+        # tests/, or any file under .kiro/specs/.
         if path.endswith("/"):
-            # Untracked directory — descend lazily by checking if it contains
-            # any *.py file. For simplicity, treat any untracked directory
-            # under src/ or scripts/ as dirty.
-            if path.startswith("src/") or path.startswith("scripts/"):
-                dirty_files.append(path)
-        else:
+            # Untracked directory under any code prefix is treated as dirty.
             if (
-                (path.startswith("src/") and path.endswith(".py"))
-                or (path.startswith("scripts/") and path.endswith((".py", ".sh")))
+                path.startswith("src/")
+                or path.startswith("scripts/")
+                or path.startswith("tests/")
+                or path.startswith(".kiro/specs/")
             ):
-                dirty_files.append(path)
+                code_dirty.append(path)
+        else:
+            if _is_code_path(path):
+                code_dirty.append(path)
 
-    return (len(dirty_files) > 0, dirty_files)
+    # The full dirty list is preserved for transparency in the manifest.
+    # The boolean gate flips only on code-dirty.
+    return (len(code_dirty) > 0, all_dirty)
 
 
 def _last_commit_for_file(repo_root: Path, relative_path: str) -> str:
