@@ -75,8 +75,12 @@ SPX_TICKER = "^GSPC"
 # yfinance returns ^SOX as a tradable symbol but some pipelines may have
 # fetched it as ".SOX" or "SOX" historically. We accept any of these for
 # robustness; the canonical name written by EdgarFetcher is ``^SOX``.
-SOX_ALIASES = {"^SOX", ".SOX", "SOX"}
-SPX_ALIASES = {"^GSPC", ".GSPC", "GSPC", "^SPX", "SPX"}
+# IMPORTANT: ordered tuple, NOT set. Set iteration is hash-randomized
+# in Python (PYTHONHASHSEED), which would produce non-deterministic
+# alias resolution when multiple aliases are present in the cache.
+# We always prefer the canonical name.
+SOX_ALIASES = ("^SOX", ".SOX", "SOX")
+SPX_ALIASES = ("^GSPC", ".GSPC", "GSPC", "^SPX", "SPX")
 
 
 # ---------------------------------------------------------------------------
@@ -374,9 +378,13 @@ class MarketFeatureBuilder:
 
     @staticmethod
     def _first_match(
-        price_by_ticker: dict[str, pd.Series], aliases: set[str]
+        price_by_ticker: dict[str, pd.Series], aliases: tuple[str, ...]
     ) -> Optional[pd.Series]:
-        """Return the first matching ticker series from a set of aliases."""
+        """Return the first matching ticker series from a tuple of aliases.
+
+        The tuple's order matters: canonical names should appear first so
+        resolution is deterministic when multiple aliases are present.
+        """
         for alias in aliases:
             if alias in price_by_ticker:
                 return price_by_ticker[alias]

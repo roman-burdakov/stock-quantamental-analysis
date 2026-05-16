@@ -375,11 +375,18 @@ class QuarterlyPanelBuilder:
         df = skeleton.copy()
         m = metrics[self._ticker_mask(metrics)].copy()
 
-        # 2a. Ratios (use as-is for quarterly periods)
+        # 2a. Ratios (use as-is for quarterly periods).
+        # Dedup deterministically: sort by source_available_date so when
+        # multiple filings report the same fiscal_period × metric (an
+        # amendment / restatement), the latest filing wins.
+        m_sorted = m.sort_values(
+            ["fiscal_period", "source_available_date"], kind="mergesort"
+        )
         for ratio in RATIO_CONCEPTS:
             ratio_col = ratio.lower()  # gross_margin, operating_margin, ...
             ratio_data = (
-                m[m["metric_name"] == ratio]
+                m_sorted[m_sorted["metric_name"] == ratio]
+                .drop_duplicates("fiscal_period", keep="last")
                 .set_index("fiscal_period")["metric_value"]
                 .to_dict()
             )
@@ -434,6 +441,13 @@ class QuarterlyPanelBuilder:
         flow_rows = metrics[metrics["metric_name"] == flow_concept]
         if flow_rows.empty:
             return {}, {}
+
+        # Dedup deterministically: when the same fiscal_period appears
+        # multiple times (amendment / restatement), keep the latest filing
+        # by source_available_date.
+        flow_rows = flow_rows.sort_values(
+            ["fiscal_period", "source_available_date"], kind="mergesort"
+        ).drop_duplicates("fiscal_period", keep="last")
 
         # Build YTD lookup keyed by fiscal_period
         ytd_by_period = (
@@ -580,6 +594,12 @@ class QuarterlyPanelBuilder:
         Pivots the long-format nlp DataFrame into wide columns named
         ``nlp_<section>_<feature_name>``. NaN fills for missing values
         (Req 3.5: NO LOCF for NLP).
+
+        Deterministic dedup: when the same (accession, section,
+        feature_name) appears multiple times in the NLP feature CSV
+        (e.g., due to multiple computation passes), the LAST row by
+        filing_date wins. We sort explicitly before pivoting so
+        ``aggfunc='last'`` is reproducible across runs.
         """
         if nlp.empty or "source_accession" not in nlp.columns:
             return panel
@@ -589,11 +609,17 @@ class QuarterlyPanelBuilder:
             "nlp_" + pivot["section"].astype(str)
             + "_" + pivot["feature_name"].astype(str)
         )
+        # Sort deterministically before pivot so aggfunc='last' is
+        # reproducible. Use filing_date as the tie-breaker (latest wins);
+        # fall back to row index for stability.
+        sort_cols = [c for c in ["source_accession", "col", "filing_date"]
+                     if c in pivot.columns]
+        pivot = pivot.sort_values(sort_cols, kind="mergesort")
         wide = pivot.pivot_table(
             index="source_accession",
             columns="col",
             values="value",
-            aggfunc="last",  # keep last if duplicates
+            aggfunc="last",
         ).reset_index()
         out = panel.merge(
             wide,
@@ -739,7 +765,8 @@ class QuarterlyPanelBuilder:
         df = prices.copy()
         df["date"] = pd.to_datetime(df["date"]).dt.tz_localize(None)
         nvda = df[df["ticker"] == self.config.ticker].set_index("date")["adj_close"]
-        spx_aliases = {"^GSPC", "GSPC", ".GSPC", "^SPX", "SPX"}
+        # Ordered tuple (canonical first) for deterministic alias resolution.
+        spx_aliases = ("^GSPC", "GSPC", ".GSPC", "^SPX", "SPX")
         spx_ticker = next((t for t in spx_aliases if t in df["ticker"].unique()), None)
         spx = (
             df[df["ticker"] == spx_ticker].set_index("date")["adj_close"]
