@@ -122,7 +122,7 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
 
 ## Milestone 4: Quarterly Panel Builder
 
-- [ ] **4.1** Implement `src/quarterly_panel.py::QuarterlyPanelBuilder`
+- [x] **4.1** Implement `src/quarterly_panel.py::QuarterlyPanelBuilder`
   - `_select_quarterly_skeleton`: filter `metrics` to rows with `fiscal_period` matching `FY\d{4}-Q[1-4]` or `FY\d{4}` (Q4 alias); pivot to one row per quarter
   - `_derive_quarterly_from_ytd`: implement YTD difference rule (Req 1.4)
   - `_attach_fundamental_features`: join YTD-derived + instant + direct quarterly metrics
@@ -132,20 +132,20 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
   - **Acceptance:** Output panel has ≥35 rows with non-null primary target; ≥30 rows for secondary; column count 20–30
   - **Reqs:** 1.1–1.6, 6.1–6.3
 
-- [ ] **4.2** Mixed-frequency YTD validation
+- [x] **4.2** Mixed-frequency YTD validation
   - Add `_validate_quarterly_sums_to_annual()`: for each FY, sum derived Q1+Q2+Q3+Q4 capex/OCF; compare to annual XBRL value; ≥1% mismatch sets `feature_imputed_<col>=True`
   - Log validation summary to `data/processed/quarterly_panel_validation.json`
   - **Acceptance:** Validation runs without error; ≥80% of FY×metric pairs have <1% sum-mismatch
   - **Reqs:** 1.4, 1.6
 
-- [ ] **4.3** No-lookahead validation for panel
+- [x] **4.3** No-lookahead validation for panel
   - For every row: `feature_available_date < target_available_date`
   - Market features were computed with `as_of_date = feature_available_date` only
   - NLP features were extracted from filings with `filing_date ≤ feature_available_date`
   - **Acceptance:** Existing `validate_no_lookahead_matrix()` (extended) returns True for entire panel
   - **Reqs:** 1.2, 6.4
 
-- [ ] **4.4** Tests for Milestone 4
+- [x] **4.4** Tests for Milestone 4
   - `tests/test_quarterly_panel.py`: row count, non-null targets, YTD-derivation correctness, no-lookahead
   - **Acceptance:** All tests pass
   - **Reqs:** 1.7, 6.4
