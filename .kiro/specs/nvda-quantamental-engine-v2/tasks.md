@@ -99,14 +99,14 @@ The default `--ml-v2-mode` is `essential` until MVP-E is validated end-to-end. S
 
 ## Milestone 3: Market Feature Builder
 
-- [ ] **3.1** Implement `src/market_features.py` with `MarketFeatureBuilder`
+- [x] **3.1** Implement `src/market_features.py` with `MarketFeatureBuilder`
   - `compute_features(prices, as_of_dates, excluded_peers)` returns DataFrame
   - All features computed only from prices with `date ≤ as_of_date`
   - Columns: trailing returns (3m, 12m), excess returns vs SOX/SPX, volatility, beta, peer-spread returns
   - **Acceptance:** Sample run on 2024-Q4 cutoff produces ~10 columns with no NaNs (except for excluded peers)
   - **Reqs:** 4.2, 4.3, 4.5
 
-- [ ] **3.2** No-lookahead invariant test
+- [x] **3.2** No-lookahead invariant test
   - `tests/test_market_features.py::test_no_lookahead_invariant`
   - Pseudocode:
     ```
